@@ -1,0 +1,16 @@
+<section class="cta-v1 py-24 mb-10">
+    <div class="container mx-auto px-6">
+        <div class="bg-gradient-to-r from-primary to-secondary rounded-[3rem] p-12 lg:p-20 text-center text-white relative overflow-hidden shadow-3xl"
+            data-aos="zoom-in">
+            <div class="absolute inset-0 bg-black/10 backdrop-blur-sm"></div>
+            <div class="relative z-10 max-w-3xl mx-auto">
+                <h2 class="text-5xl font-black mb-6">{{ self.title }}</h2>
+                <p class="text-xl mb-10 opacity-90">{{ self.subtitle }}</p>
+                <a href="{{ self.button_link }}"
+                    class="inline-block bg-white text-primary px-12 py-5 rounded-full font-black text-xl hover:scale-105 transition-transform shadow-xl">
+                    {{ self.button_text }}
+                </a>
+            </div>
+        </div>
+    </div>
+</section>

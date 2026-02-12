@@ -1,0 +1,11 @@
+django>=4.2,<5.0
+django-tenants>=3.5.0
+wagtail>=5.2
+psycopg2-binary
+django-redis
+requests
+python-dotenv
+django-compressor
+django-libsass
+AOS
+google-genai

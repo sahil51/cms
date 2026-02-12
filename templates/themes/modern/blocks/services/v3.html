@@ -1,0 +1,24 @@
+<section class="services-v3 py-32"
+    style="background: linear-gradient(to bottom, transparent, rgba(108, 99, 255, 0.05));">
+    <div class="container mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div class="lg:col-span-4" data-aos="fade-right">
+            <h2 class="text-5xl font-black mb-6 leading-tight">{{ self.title }}</h2>
+            <div class="w-20 h-2 mb-8 rounded-full bg-gradient-to-r from-primary to-secondary"></div>
+            <p class="text-lg opacity-60">Discover our comprehensive range of specialized solutions tailored for your
+                success.</p>
+        </div>
+        <div class="lg:col-span-8 flex flex-wrap gap-6">
+            {% for item in self.services %}
+            <div class="flex-1 min-w-[300px] p-1 rounded-3xl bg-gradient-to-br from-white/10 to-transparent"
+                data-aos="zoom-in" data-aos-delay="{{ forloop.counter0 }}00">
+                <div class="bg-slate-900 h-full p-8 rounded-[1.4rem]">
+                    <h3 class="text-2xl font-bold mb-4 flex items-center gap-3">
+                        <span class="text-primary">•</span> {{ item.name }}
+                    </h3>
+                    <p class="text-slate-400">{{ item.description }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>

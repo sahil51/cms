@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block content %}
+<section class="py-32 bg-black text-white" style="background-color: var(--background-color);">
+    <div class="container mx-auto px-6">
+        <h1 class="text-8xl md:text-[12rem] font-black uppercase leading-none mb-24 border-b-[30px] border-primary pb-12"
+            data-aos="fade-right">Insight.</h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-16">
+            {% for post in blogposts %}
+            <article class="relative group" data-aos="zoom-in" data-aos-delay="{{ forloop.counter0|add:1 }}00">
+                <div
+                    class="absolute inset-0 bg-primary translate-x-4 translate-y-4 group-hover:translate-x-8 group-hover:translate-y-8 transition-transform">
+                </div>
+                <div class="relative bg-white text-black p-12 border-8 border-black">
+                    <div class="flex justify-between items-start mb-12">
+                        <div class="text-xs font-black uppercase tracking-widest bg-black text-white px-4 py-2">{{
+                            post.specific.date }}</div>
+                    </div>
+
+                    <h2 class="text-4xl md:text-5xl font-black uppercase leading-tight mb-8">
+                        <a href="{% pageurl post %}">{{ post.title }}</a>
+                    </h2>
+
+                    <p class="text-xl font-bold opacity-70 mb-12 line-clamp-3">{{ post.specific.intro }}</p>
+
+                    <a href="{% pageurl post %}"
+                        class="inline-block bg-black text-white px-10 py-5 text-xl font-black uppercase tracking-tighter hover:bg-primary transition-all shadow-[8px_8px_0_0_rgba(0,0,0,0.3)]">
+                        Explore Now!
+                    </a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

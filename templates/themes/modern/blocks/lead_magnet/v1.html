@@ -1,0 +1,78 @@
+{% load wagtailimages_tags %}
+<section class="lead-magnet-v1" data-aos="{{ self.animation }}">
+    <div class="container">
+        <div class="magnet-card">
+            <div class="magnet-text">
+                <h2>{{ self.title }}</h2>
+                {% if self.subtitle %}
+                <p>{{ self.subtitle }}</p>
+                {% endif %}
+                <div class="mt-8">
+                    <a href="{{ self.form_action|default:'#' }}" class="btn btn-primary magnet-btn">
+                        {{ self.offer_text }} <i class="fa fa-download ml-2 text-sm opacity-50"></i>
+                    </a>
+                </div>
+            </div>
+            {% if self.image %}
+            <div class="magnet-image">
+                {% image self.image width-600 class="rounded-2xl" %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<style>
+    .lead-magnet-v1 {
+        padding: 60px 0;
+    }
+
+    .magnet-card {
+        background: linear-gradient(135deg, rgba(108, 99, 255, 0.2), rgba(255, 101, 132, 0.2));
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 5rem;
+        border-radius: 40px;
+        display: flex;
+        align-items: center;
+        gap: 5rem;
+        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(20px);
+    }
+
+    .magnet-text {
+        flex: 1;
+    }
+
+    .magnet-text h2 {
+        font-size: 3rem;
+        font-weight: 900;
+        margin-bottom: 1.5rem;
+        line-height: 1.1;
+    }
+
+    .magnet-text p {
+        font-size: 1.25rem;
+        opacity: 0.7;
+        line-height: 1.6;
+    }
+
+    .magnet-image {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+    }
+
+    .magnet-btn {
+        font-size: 1.125rem;
+        padding: 1.25rem 3rem;
+        border-radius: 100px;
+    }
+
+    @media (max-width: 992px) {
+        .magnet-card {
+            flex-direction: column;
+            padding: 3rem;
+            text-align: center;
+        }
+    }
+</style>

@@ -1,0 +1,22 @@
+<section class="faq-v1 py-20 bg-slate-900/30">
+    <div class="container mx-auto max-w-3xl px-6">
+        <h2 class="text-4xl font-bold mb-12 text-center" data-aos="fade-up">{{ self.title }}</h2>
+        <div class="space-y-4">
+            {% for item in self.items %}
+            <details
+                class="group bg-white/5 border border-white/10 rounded-2xl p-6 transition-all duration-300 open:bg-white/10"
+                data-aos="fade-up" data-aos-delay="{{ forloop.counter0 }}00">
+                <summary class="flex items-center justify-between cursor-pointer font-bold text-lg list-none">
+                    {{ item.question }}
+                    <span class="text-primary transition-transform group-open:rotate-180">
+                        <i class="fa fa-chevron-down"></i>
+                    </span>
+                </summary>
+                <div class="mt-4 opacity-70 prose prose-invert">
+                    {{ item.answer }}
+                </div>
+            </details>
+            {% endfor %}
+        </div>
+    </div>
+</section>

@@ -1,0 +1,78 @@
+{% load wagtailcore_tags wagtailimages_tags %}
+<section class="about-v1">
+    <div class="container">
+        <div class="about-grid">
+            <div class="about-text">
+                <span class="badge">About Us</span>
+                <h2>{{ self.title }}</h2>
+                <div class="richtext">
+                    {{ self.content|richtext }}
+                </div>
+            </div>
+            {% if self.image %}
+            <div class="about-image">
+                {% image self.image fill-600x500 class="img-fluid" %}
+                <div class="image-overlay"></div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<style>
+    .about-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 5rem;
+        align-items: center;
+    }
+
+    .badge {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+        display: inline-block;
+    }
+
+    .about-text h2 {
+        font-size: 3rem;
+        margin-bottom: 2rem;
+    }
+
+    .about-image {
+        position: relative;
+    }
+
+    .img-fluid {
+        display: block;
+        width: 100%;
+        height: auto;
+        border-radius: 30px;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+        position: relative;
+        z-index: 2;
+    }
+
+    .image-overlay {
+        position: absolute;
+        top: 20px;
+        right: -20px;
+        width: 100%;
+        height: 100%;
+        border: 2px solid var(--secondary-color);
+        border-radius: 30px;
+        z-index: 1;
+    }
+
+    @media (max-width: 768px) {
+        .about-grid {
+            grid-template-columns: 1fr;
+            gap: 3rem;
+        }
+    }
+</style>

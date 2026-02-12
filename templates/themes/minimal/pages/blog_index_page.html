@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block content %}
+<section class="py-32 bg-white" style="background-color: var(--background-color);">
+    <div class="container mx-auto px-6 max-w-4xl">
+        <h1 class="text-xs uppercase tracking-[0.4em] font-black opacity-30 mb-20 text-center" data-aos="fade-up">
+            Journal</h1>
+
+        <div class="space-y-32">
+            {% for post in blogposts %}
+            <article class="group" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}00">
+                <div class="flex flex-col md:flex-row gap-16 items-baseline border-b border-black/5 pb-24">
+                    <div class="text-[10px] font-black uppercase tracking-[0.2em] opacity-20">0{{ forloop.counter }}
+                    </div>
+                    <div class="flex-1">
+                        <div class="text-[10px] font-black uppercase tracking-widest text-primary mb-4">{{
+                            post.specific.date }}</div>
+                        <h2 class="text-4xl font-light mb-8 group-hover:translate-x-4 transition-transform">
+                            <a href="{% pageurl post %}">{{ post.title }}</a>
+                        </h2>
+                        <p class="text-xl font-light opacity-50 mb-12 max-w-2xl leading-relaxed">{{ post.specific.intro
+                            }}</p>
+                        <a href="{% pageurl post %}"
+                            class="text-xs font-bold uppercase tracking-[0.2em] border-b border-primary pb-1 hover:opacity-50 transition-opacity">
+                            Read Entry
+                        </a>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

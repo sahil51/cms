@@ -1,0 +1,17 @@
+<section class="bold-faq-v1 py-24" style="background-color: var(--primary-color);">
+    <div class="container mx-auto px-6">
+        <h2 class="text-7xl font-black uppercase mb-16 text-white border-b-8 border-black pb-4 inline-block">{{
+            self.title }}</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {% for item in self.items %}
+            <div class="bg-black text-white p-10 border-4 border-white shadow-[10px_10px_0_0_rgba(255,255,255,0.2)]"
+                data-aos="fade-up">
+                <h3 class="text-2xl font-black uppercase mb-6 text-primary">{{ item.question }}</h3>
+                <div class="prose prose-invert prose-lg font-bold opacity-70">
+                    {{ item.answer }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>

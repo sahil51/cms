@@ -1,0 +1,19 @@
+<section class="bold-about-v1 py-24 relative overflow-hidden" style="background-color: var(--background-color);">
+    <div class="container mx-auto px-6">
+        <div class="flex flex-col lg:flex-row gap-0">
+            <div class="lg:w-1/2 bg-black p-16 text-white" data-aos="fade-right">
+                <h2 class="text-7xl font-black uppercase mb-12 transform -rotate-1 origin-left">{{ self.title }}</h2>
+                <div class="prose prose-invert prose-2xl font-bold opacity-90">
+                    {{ self.content }}
+                </div>
+            </div>
+            <div class="lg:w-1/2 relative min-h-[500px]" data-aos="fade-left">
+                {% if self.image %}
+                {% image self.image original class="absolute inset-0 w-full h-full object-cover grayscale" %}
+                {% endif %}
+                <div class="absolute inset-0 bg-primary/20 mix-blend-multiply"></div>
+                <div class="absolute bottom-10 right-10 border-20 border-white/10 w-40 h-40"></div>
+            </div>
+        </div>
+    </div>
+</section>

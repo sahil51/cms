@@ -1,0 +1,14 @@
+<section class="minimal-testimonials-v1 py-24 bg-white">
+    <div class="container mx-auto max-w-4xl px-6 text-center">
+        <h2 class="text-[10px] uppercase tracking-[0.6em] font-black opacity-20 mb-20">{{ self.title }}</h2>
+        <div class="space-y-20">
+            {% for item in self.testimonials %}
+            <div class="relative" data-aos="fade-up">
+                <p class="text-2xl font-light italic leading-relaxed mb-8 opacity-70">"{{ item.quote }}"</p>
+                <div class="text-sm tracking-widest uppercase font-bold text-primary">{{ item.author }}</div>
+                <div class="text-[10px] opacity-30 mt-1">{{ item.role }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>

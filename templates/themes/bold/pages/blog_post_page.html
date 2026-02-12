@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block content %}
+<article class="py-32 bg-white text-black" style="background-color: var(--background-color);">
+    <div class="container mx-auto px-6 max-w-5xl">
+        <header class="mb-24" data-aos="fade-down">
+            <div class="flex items-center gap-6 mb-12">
+                <span class="bg-primary text-white px-6 py-2 font-black uppercase text-xl inline-block">{{ page.date
+                    }}</span>
+                <span class="text-4xl font-black uppercase">Article.</span>
+            </div>
+            <h1
+                class="text-7xl md:text-9xl font-black uppercase leading-[0.85] tracking-tighter mb-12 border-l-[20px] border-black pl-12">
+                {{ page.title }}<span class="text-primary">!</span>
+            </h1>
+            <p class="text-3xl font-bold opacity-80 leading-tight max-w-3xl">{{ page.intro }}</p>
+        </header>
+
+        <div class="prose prose-bold max-w-none mb-32">
+            {% for block in page.body %}
+            {% if block.block_type == 'paragraph' %}
+            <div class="text-2xl font-bold leading-relaxed mb-16 border-b-4 border-black/5 pb-16">{{ block.value }}
+            </div>
+            {% elif block.block_type == 'heading' %}
+            <h2
+                class="text-5xl font-black uppercase tracking-tight mt-32 mb-12 bg-black text-white px-8 py-4 inline-block">
+                {{ block.value }}</h2>
+            {% elif block.block_type == 'image' %}
+            <div class="my-24 relative">
+                <div class="absolute inset-0 bg-primary translate-x-6 translate-y-6"></div>
+                <div class="relative border-8 border-black">
+                    {% image block.value width-2000 class="w-full h-auto" %}
+                </div>
+            </div>
+            {% else %}
+            <div class="my-24">
+                {% include_block block %}
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <footer class="pt-24 border-t-8 border-black flex flex-col md:flex-row justify-between items-center gap-12">
+            <a href="{{ page.get_parent.url }}"
+                class="bg-black text-white px-12 py-6 text-2xl font-black uppercase tracking-tighter hover:bg-primary transition-all">
+                &lsaquo; Back to Index
+            </a>
+            <div class="flex gap-8 text-4xl">
+                <i class="fab fa-twitter hover:text-primary cursor-pointer"></i>
+                <i class="fab fa-facebook hover:text-primary cursor-pointer"></i>
+                <i class="fab fa-linkedin hover:text-primary cursor-pointer"></i>
+            </div>
+        </footer>
+    </div>
+</article>
+{% endblock %}

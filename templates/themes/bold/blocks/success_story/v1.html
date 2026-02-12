@@ -1,0 +1,39 @@
+{% load wagtailimages_tags %}
+<section class="bold-success-story-v1 py-32" style="background-color: var(--primary-color);"
+    data-aos="{{ self.animation }}">
+    <div class="container mx-auto px-6">
+        <h2 class="text-7xl md:text-9xl font-black uppercase text-white mb-24 leading-none" data-aos="fade-right">{{
+            self.title }}!!</h2>
+        <div class="space-y-32">
+            {% for item in self.stories %}
+            <div class="flex flex-col {% if forloop.counter|divisibleby:2 %}md:flex-row-reverse{% else %}md:flex-row{% endif %} items-center gap-16"
+                data-aos="zoom-in">
+                <div class="w-full md:w-1/2">
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-black translate-x-6 translate-y-6"></div>
+                        <div class="relative border-8 border-black overflow-hidden">
+                            {% if item.image %}
+                            {% image item.image fill-1200x800 class="w-full h-full object-cover" %}
+                            {% else %}
+                            <div class="aspect-video bg-white/20"></div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/2 text-white">
+                    <span class="inline-block bg-black text-white px-4 py-2 font-black uppercase text-sm mb-6">{{
+                        item.client_name }}</span>
+                    <h3 class="text-4xl md:text-6xl font-black uppercase mb-8 leading-tight">{{ item.story_title }}</h3>
+                    <p class="text-2xl font-bold opacity-90 mb-12">{{ item.summary }}</p>
+                    {% if item.link %}
+                    <a href="{{ item.link }}"
+                        class="inline-block bg-white text-black px-12 py-6 text-xl font-black uppercase tracking-tighter hover:bg-black hover:text-white transition-all shadow-[10px_10px_0_0_rgba(0,0,0,0.5)]">
+                        Full Details
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>

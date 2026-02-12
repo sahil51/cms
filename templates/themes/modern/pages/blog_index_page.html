@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block content %}
+<section class="py-24 bg-slate-900/50">
+    <div class="container mx-auto px-6">
+        <h1 class="text-6xl font-black mb-8 uppercase tracking-tighter" data-aos="fade-right">{{ page.title }}</h1>
+        <div class="prose prose-invert prose-xl opacity-70 mb-16" data-aos="fade-right" data-aos-delay="100">
+            {{ page.intro|richtext }}
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+            {% for post in blogposts %}
+            <article
+                class="bg-white/5 border border-white/10 rounded-[3rem] overflow-hidden group hover:border-primary/50 transition-all duration-500"
+                data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}00">
+                <div class="aspect-video overflow-hidden">
+                    {% if post.specific.image %}
+                    {% image post.specific.image fill-800x450 class="w-full h-full object-cover group-hover:scale-110
+                    transition-transform duration-700" %}
+                    {% else %}
+                    <div class="w-full h-full bg-slate-800 flex items-center justify-center">
+                        <i class="fa fa-newspaper text-4xl opacity-20"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="p-8">
+                    <div class="text-xs font-bold text-primary uppercase tracking-widest mb-4">{{ post.specific.date }}
+                    </div>
+                    <h2 class="text-2xl font-black mb-4 group-hover:text-primary transition-colors leading-tight">
+                        <a href="{% pageurl post %}">{{ post.title }}</a>
+                    </h2>
+                    <p class="opacity-60 mb-8 line-clamp-3">{{ post.specific.intro }}</p>
+                    <a href="{% pageurl post %}"
+                        class="inline-flex items-center gap-2 font-bold uppercase text-sm tracking-widest text-primary group-hover:gap-4 transition-all">
+                        Read Story <i class="fa fa-arrow-right text-xs"></i>
+                    </a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

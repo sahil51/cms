@@ -1,0 +1,27 @@
+<section class="minimal-hero-v1 py-32 text-center" style="background-color: var(--background-color);">
+    <div class="container mx-auto max-w-4xl px-6">
+        <h1 class="text-5xl font-light tracking-tight mb-8"
+            style="color: var(--text-color); font-family: var(--heading-font);" data-aos="fade-up">
+            {{ self.title }}
+        </h1>
+        <div class="w-12 h-[2px] bg-primary mx-auto mb-8 opacity-30" data-aos="fade-up" data-aos-delay="100"></div>
+        <p class="text-xl opacity-60 font-light leading-relaxed mb-12" data-aos="fade-up" data-aos-delay="200">
+            {{ self.subtitle }}
+        </p>
+        <div class="flex flex-col md:flex-row items-center justify-center gap-8 mt-12" data-aos="fade-up"
+            data-aos-delay="300">
+            {% if self.cta_text %}
+            <a href="{{ self.cta_link }}"
+                class="text-sm uppercase tracking-[0.2em] font-bold border-b-2 border-primary pb-1 hover:opacity-70 transition-opacity">
+                {{ self.cta_text }}
+            </a>
+            {% endif %}
+            {% if self.secondary_cta_text %}
+            <a href="{{ self.secondary_cta_link }}"
+                class="text-sm uppercase tracking-[0.2em] font-medium opacity-50 hover:opacity-100 transition-opacity">
+                {{ self.secondary_cta_text }}
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</section>

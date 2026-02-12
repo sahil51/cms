@@ -1,0 +1,21 @@
+{% load wagtailimages_tags %}
+<section class="minimal-partners-v1 py-20" data-aos="{{ self.animation }}">
+    <div class="container mx-auto px-6">
+        <div class="flex flex-wrap justify-between items-center gap-12 opacity-30">
+            {% for partner in self.partners %}
+            <div class="partner-logo" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}00">
+                {% if partner.link %}
+                <a href="{{ partner.link }}" target="_blank" rel="noopener"
+                    class="block grayscale hover:grayscale-0 transition-all duration-500">
+                    {% image partner.logo height-40 %}
+                </a>
+                {% else %}
+                <div class="grayscale">
+                    {% image partner.logo height-40 %}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>

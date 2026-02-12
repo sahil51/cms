@@ -1,0 +1,22 @@
+<section class="bold-services-v1 py-24" style="background-color: var(--background-color);">
+    <div class="container mx-auto px-6">
+        <h2 class="text-7xl font-black uppercase mb-20 border-b-16 border-primary pb-8 inline-block"
+            data-aos="fade-right">{{ self.title }}</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-0 border-8 border-black">
+            {% for item in self.services %}
+            <div class="p-12 border-4 border-black group hover:bg-primary hover:text-white transition-colors"
+                data-aos="zoom-in">
+                <div class="text-6xl font-black mb-8 opacity-20 group-hover:opacity-100">0{{ forloop.counter }}</div>
+                <h3 class="text-3xl font-black uppercase mb-6">{{ item.name }}</h3>
+                <p class="text-xl font-bold opacity-70 group-hover:opacity-100 mb-8">{{ item.description }}</p>
+                {% if item.link %}
+                <a href="{{ item.link }}"
+                    class="inline-block bg-black text-white px-6 py-3 text-sm font-black uppercase tracking-tighter hover:bg-white hover:text-black transition-all">
+                    {{ item.cta_text|default:"Learn More" }}!
+                </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>

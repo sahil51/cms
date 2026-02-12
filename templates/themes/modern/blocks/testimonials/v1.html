@@ -1,0 +1,24 @@
+<section class="testimonials-v1 py-20"
+    style="background: radial-gradient(circle at bottom left, rgba(255, 101, 132, 0.05), transparent);">
+    <div class="container mx-auto px-6 text-center">
+        <h2 class="text-4xl font-bold mb-16" data-aos="fade-up">{{ self.title }}</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+            {% for item in self.testimonials %}
+            <div class="bg-white/5 p-8 rounded-3xl border border-white/10 relative" data-aos="fade-up"
+                data-aos-delay="{{ forloop.counter0 }}00">
+                <div class="text-primary text-5xl absolute -top-4 -left-2 opacity-20">"</div>
+                <p class="text-lg italic mb-8 relative z-10 opacity-80">{{ item.quote }}</p>
+                <div class="flex items-center justify-center gap-4">
+                    {% if item.image %}
+                    {% image item.image fill-50x50-c80 class="rounded-full ring-2 ring-primary" %}
+                    {% endif %}
+                    <div class="text-left">
+                        <div class="font-bold">{{ item.author }}</div>
+                        <div class="text-sm opacity-50">{{ item.role }}</div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>

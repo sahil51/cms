@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags %}
+
+{% block content %}
+<section class="py-24 bg-slate-900/50">
+    <div class="container mx-auto px-6">
+        <h1 class="text-6xl font-black mb-8 uppercase tracking-tighter" data-aos="fade-right">{{ page.title }}</h1>
+        <div class="prose prose-invert prose-xl opacity-70 mb-16" data-aos="fade-right" data-aos-delay="100">
+            {{ page.intro }}
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for area in page.get_children.live %}
+            <a href="{% pageurl area %}"
+                class="group bg-white/5 p-12 rounded-[3rem] border border-white/10 hover:border-primary/50 transition-all duration-500"
+                data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}00">
+                <h2
+                    class="text-3xl font-black uppercase tracking-tight group-hover:text-primary transition-colors mb-4">
+                    {{ area.specific.location_name|default:area.title }}
+                </h2>
+                <div
+                    class="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-primary opacity-50 group-hover:opacity-100 group-hover:gap-4 transition-all">
+                    Explore Local Services <i class="fa fa-arrow-right text-xs"></i>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

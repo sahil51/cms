@@ -1,0 +1,20 @@
+<section class="about-v2 py-20 text-center" style="background-color: var(--background-color);">
+    <div class="container mx-auto px-6">
+        <div class="max-w-4xl mx-auto bg-white/5 backdrop-blur-xl p-12 rounded-[2rem] border border-white/10 shadow-2xl"
+            data-aos="zoom-in">
+            <h2 class="text-4xl font-bold mb-8 uppercase tracking-widest" style="color: var(--primary-color);">{{
+                self.title }}</h2>
+            <div class="prose prose-invert max-w-none text-xl leading-relaxed opacity-80 mb-10">
+                {{ self.content }}
+            </div>
+            {% if self.image %}
+            <div class="relative group">
+                <div
+                    class="absolute -inset-1 bg-gradient-to-r from-primary to-secondary rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200">
+                </div>
+                {% image self.image original class="relative rounded-2xl shadow-2xl" %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>

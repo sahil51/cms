@@ -1,0 +1,30 @@
+{% load wagtailimages_tags %}
+<section class="minimal-success-story-v1 py-32" data-aos="{{ self.animation }}">
+    <div class="container mx-auto px-6 max-w-5xl">
+        <h2 class="text-xs uppercase tracking-[0.4em] font-black opacity-30 mb-20 text-center">{{ self.title }}</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-20">
+            {% for item in self.stories %}
+            <div class="minimal-story-item" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}00">
+                <div class="mb-8 overflow-hidden grayscale aspect-video">
+                    {% if item.image %}
+                    {% image item.image fill-800x450 class="w-full h-full object-cover grayscale hover:grayscale-0
+                    transition-all duration-700" %}
+                    {% else %}
+                    <div class="w-full h-full bg-black/5"></div>
+                    {% endif %}
+                </div>
+                <span class="text-[10px] uppercase tracking-widest font-black opacity-30 mb-2 block">{{ item.client_name
+                    }}</span>
+                <h3 class="text-3xl font-light mb-6 leading-tight">{{ item.story_title }}</h3>
+                <p class="text-lg font-light opacity-50 mb-8 max-w-md">{{ item.summary }}</p>
+                {% if item.link %}
+                <a href="{{ item.link }}"
+                    class="text-xs font-bold uppercase tracking-widest border-b border-primary pb-1 hover:opacity-50 transition-opacity">
+                    View Case
+                </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>

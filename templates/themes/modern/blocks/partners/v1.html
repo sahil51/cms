@@ -1,0 +1,44 @@
+{% load wagtailimages_tags %}
+<section class="partners-v1" data-aos="{{ self.animation }}">
+    <div class="container">
+        <div class="section-header text-center mb-12">
+            <h3 class="text-sm font-bold uppercase tracking-[0.3em] opacity-40">{{ self.title }}</h3>
+        </div>
+        <div class="partners-logo-grid">
+            {% for partner in self.partners %}
+            <div class="partner-logo-item" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}00">
+                {% if partner.link %}
+                <a href="{{ partner.link }}" target="_blank" rel="noopener"
+                    class="block grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500">
+                    {% image partner.logo height-60 %}
+                </a>
+                {% else %}
+                <div class="grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-500">
+                    {% image partner.logo height-60 %}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<style>
+    .partners-v1 {
+        padding: 60px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .partners-logo-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 4rem;
+    }
+
+    .partner-logo-item {
+        max-width: 180px;
+    }
+</style>

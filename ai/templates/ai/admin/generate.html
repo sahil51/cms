@@ -1,0 +1,106 @@
+{% extends "wagtailadmin/base.html" %}{% load i18n wagtailadmin_tags %}
+{% block titletag %}{% trans "AI Theme Generator" %}{% endblock %}
+
+{% block content %}
+<header class="merged">
+    <div class="row">
+        <div class="left">
+            <div class="col">
+                <h1 class="icon icon-magic">{% trans "AI Theme Generator" %}</h1>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="nice-padding">
+    <div class="help-block" style="margin-bottom: 2rem;">
+        <p>
+            Enter a description for your website's theme or a specific section.
+            Our AI will automatically adjust colors, typography, and layouts to match your vision.
+        </p>
+    </div>
+
+    <form action="" method="POST" id="ai-generate-form">
+        {% csrf_token %}
+
+        <div class="field-row" style="display: flex; gap: 2rem; margin-bottom: 2rem;">
+            <!-- Page Selection -->
+            <div class="field" style="flex: 1;">
+                <label for="page_id">Target Page</label>
+                <div class="field-content">
+                    <select name="page_id" id="page_id" style="width: 100%;">
+                        <option value="global">Global Theme (All Pages)</option>
+                        {% for page in pages %}
+                        <option value="{{ page.id }}">{{ page.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Section Selection (Dynamic) -->
+            <div class="field" id="section-field" style="flex: 1; display: none;">
+                <label for="block_id">Target Section</label>
+                <div class="field-content">
+                    <select name="block_id" id="block_id" style="width: 100%;">
+                        <option value="">Select a section...</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="prompt">Design Prompt</label>
+            <div class="field-content">
+                <div class="input">
+                    <textarea name="prompt" id="prompt" rows="6"
+                        placeholder="e.g. Make the hero section more vibrant with a dark glassmorphism card..."
+                        style="width: 100%; border-radius: 4px; border: 1px solid var(--w-color-grey-150); padding: 10px;"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 2rem;">
+            <button type="submit" class="button button-longrunning">
+                {% icon name="magic" %}
+                <span class="label" id="submit-label">{% trans "Update Global Theme" %}</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const pageSelect = document.getElementById('page_id');
+        const sectionField = document.getElementById('section-field');
+        const sectionSelect = document.getElementById('block_id');
+        const submitLabel = document.getElementById('submit-label');
+
+        pageSelect.addEventListener('change', function () {
+            const pageId = this.value;
+
+            if (pageId === 'global') {
+                sectionField.style.display = 'none';
+                submitLabel.textContent = '{% trans "Update Global Theme" %}';
+                sectionSelect.required = false;
+            } else {
+                sectionField.style.display = 'block';
+                submitLabel.textContent = '{% trans "Update Specific Section" %}';
+                sectionSelect.required = true;
+
+                // Fetch sections for this page
+                fetch(`/admin/ai-generate/api/sections/${pageId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        sectionSelect.innerHTML = '<option value="">Select a section...</option>';
+                        data.sections.forEach(section => {
+                            const option = document.createElement('option');
+                            option.value = section.id;
+                            option.textContent = section.label;
+                            sectionSelect.appendChild(option);
+                        });
+                    });
+            }
+        });
+    });
+</script>
+{% endblock %}

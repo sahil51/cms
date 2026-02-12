@@ -1,0 +1,43 @@
+{% load wagtailimages_tags %}
+<section class="hero-v1">
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="display-1">{{ self.title }}</h1>
+            <p class="lead">{{ self.subtitle }}</p>
+            <div class="flex gap-4 justify-center mt-8">
+                {% if self.cta_text %}
+                <a href="{{ self.cta_link }}" class="btn btn-primary">{{ self.cta_text }}</a>
+                {% endif %}
+                {% if self.secondary_cta_text %}
+                <a href="{{ self.secondary_cta_link }}" class="btn bg-white/10 hover:bg-white/20 text-white">{{
+                    self.secondary_cta_text }}</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .hero-v1 {
+        padding: 120px 0;
+        text-align: center;
+        background: radial-gradient(circle at top right, rgba(108, 99, 255, 0.1), transparent);
+    }
+
+    .hero-v1 h1 {
+        font-size: 4.5rem;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .hero-v1 p {
+        font-size: 1.25rem;
+        max-width: 600px;
+        margin: 0 auto 2rem;
+        opacity: 0.8;
+    }
+</style>

@@ -1,0 +1,31 @@
+<section class="bold-hero-v1 py-32" style="background-color: var(--primary-color); color: white;">
+    <div class="container mx-auto px-6 relative">
+        <div
+            class="absolute -top-10 left-0 text-[200px] font-black opacity-10 select-none pointer-events-none uppercase">
+            HELLO.</div>
+        <div class="relative z-10 max-w-5xl">
+            <h1 class="text-8xl md:text-9xl font-black uppercase leading-[0.85] mb-8" data-aos="zoom-in"
+                data-aos-duration="1000">
+                {{ self.title }}<span class="text-black">.</span>
+            </h1>
+            <p class="text-2xl font-bold max-w-2xl mb-12 border-l-8 border-black pl-8" data-aos="fade-up"
+                data-aos-delay="300">
+                {{ self.subtitle }}
+            </p>
+            <div class="flex flex-wrap gap-6 mt-12">
+                {% if self.cta_text %}
+                <a href="{{ self.cta_link }}"
+                    class="inline-block bg-black text-white px-10 py-5 text-xl font-black uppercase tracking-tighter hover:bg-white hover:text-black hover:-translate-y-2 transition-all shadow-[8px_8px_0_0_rgba(255,255,255,0.3)]">
+                    {{ self.cta_text }}
+                </a>
+                {% endif %}
+                {% if self.secondary_cta_text %}
+                <a href="{{ self.secondary_cta_link }}"
+                    class="inline-block border-4 border-black text-black px-10 py-5 text-xl font-black uppercase tracking-tighter hover:bg-black hover:text-white hover:-translate-y-2 transition-all shadow-[8px_8px_0_0_rgba(0,0,0,0.2)]">
+                    {{ self.secondary_cta_text }}
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
