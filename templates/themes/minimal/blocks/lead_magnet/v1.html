@@ -1,23 +1,80 @@
 {% load wagtailimages_tags %}
-<section class="minimal-lead-magnet-v1 py-32" data-aos="{{ self.animation }}">
-    <div class="container mx-auto px-6 max-w-4xl">
-        <div class="border-y border-black/5 py-24 flex flex-col md:flex-row items-center gap-16">
-            <div class="flex-1">
-                <h2 class="text-xs uppercase tracking-[0.4em] font-black opacity-30 mb-8">{{ self.title }}</h2>
-                {% if self.subtitle %}
-                <p class="text-3xl font-light leading-snug mb-12">{{ self.subtitle }}</p>
-                {% endif %}
-                <a href="{{ self.form_action|default:'#' }}"
-                    class="inline-block px-12 py-5 bg-black text-white text-xs uppercase tracking-[0.2em] font-bold hover:bg-primary transition-colors">
-                    {{ self.offer_text }}
-                </a>
-            </div>
+<section class="lead-magnet-section" {% if self.section_id %}id="{{ self.section_id }}" {% endif %}
+    data-aos="{{ self.animation|default:'fade-up' }}">
+    <div class="container">
+        <div class="lead-magnet-card">
             {% if self.image %}
-            <div class="w-64">
-                {% image self.image width-400 class="opacity-80 grayscale hover:grayscale-0 transition-all duration-700"
-                %}
-            </div>
+            <div class="lm-image">{% image self.image fill-400x400 as lm_img %}<img src="{{ lm_img.url }}"
+                    alt="{{ self.title }}" loading="lazy"></div>
             {% endif %}
+            <div class="lm-content">
+                <h2>{{ self.title }}</h2>
+                {% if self.subtitle %}<p>{{ self.subtitle }}</p>{% endif %}
+                <form action="{{ self.form_action|default:'#' }}" method="post" class="lm-form">
+                    {% csrf_token %}
+                    <input type="email" placeholder="Enter your email" required>
+                    <button type="submit" class="btn btn-primary">{{ self.offer_text }} <i
+                            class="fa-solid fa-download"></i></button>
+                </form>
+            </div>
         </div>
     </div>
 </section>
+<style>
+    .lead-magnet-card {
+        display: flex;
+        align-items: center;
+        gap: 48px;
+        background: var(--bg-card);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: var(--radius);
+        padding: 48px;
+    }
+
+    .lm-image img {
+        width: 200px;
+        border-radius: 12px;
+    }
+
+    .lm-content h2 {
+        font-size: 1.6rem;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .lm-content p {
+        color: var(--text-muted);
+        margin-bottom: 24px;
+    }
+
+    .lm-form {
+        display: flex;
+        gap: 12px;
+    }
+
+    .lm-form input {
+        flex: 1;
+        padding: 12px 16px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        color: var(--text);
+        font-size: 0.95rem;
+    }
+
+    .lm-form input:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    @media (max-width:768px) {
+        .lead-magnet-card {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .lm-form {
+            flex-direction: column;
+        }
+    }
+</style>

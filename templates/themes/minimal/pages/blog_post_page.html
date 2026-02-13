@@ -1,40 +1,175 @@
 {% extends "base.html" %}
-{% load wagtailcore_tags wagtailimages_tags %}
+{% load wagtailcore_tags wagtailimages_tags theme_tags %}
+
+{% block title %}{{ page.title }} | Blog{% endblock %}
 
 {% block content %}
-<article class="py-32 bg-white" style="background-color: var(--background-color);">
-    <div class="container mx-auto px-6 max-w-3xl">
-        <header class="mb-24 text-center">
-            <div class="text-[10px] font-black uppercase tracking-[0.4em] opacity-30 mb-8">{{ page.date }}</div>
-            <h1 class="text-5xl font-light mb-12 tracking-tight leading-tight">{{ page.title }}</h1>
-            <p class="text-xl font-light opacity-50 italic">{{ page.intro }}</p>
-            <div class="w-12 h-[1px] bg-primary mx-auto mt-16 opacity-30"></div>
-        </header>
-
-        <div class="prose prose-minimal max-w-none mb-32">
-            {% for block in page.body %}
-            {% if block.block_type == 'paragraph' %}
-            <div class="text-lg font-light leading-relaxed opacity-70 mb-12">{{ block.value }}</div>
-            {% elif block.block_type == 'heading' %}
-            <h2 class="text-2xl font-light tracking-tight mt-24 mb-12">{{ block.value }}</h2>
-            {% elif block.block_type == 'image' %}
-            <div
-                class="my-24 overflow-hidden grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-1000">
-                {% image block.value width-1600 class="w-full h-auto" %}
+<article class="blog-post">
+    <header class="post-hero" data-aos="fade-up">
+        <div class="container">
+            <div class="post-meta">
+                {% if page.category %}<span class="blog-tag">{{ page.category }}</span>{% endif %}
+                <span class="blog-date"><i class="fa-regular fa-calendar"></i> {{ page.date }}</span>
             </div>
-            {% else %}
-            <div class="my-24">
-                {% include_block block %}
-            </div>
-            {% endif %}
-            {% endfor %}
+            <h1>{{ page.title }}</h1>
+            <p class="post-intro">{{ page.intro }}</p>
         </div>
+    </header>
 
-        <footer
-            class="pt-16 border-t border-black/5 flex justify-between items-center text-[10px] uppercase tracking-widest font-black opacity-30">
-            <a href="{{ page.get_parent.url }}" class="hover:opacity-100 transition-opacity">Back to Journal</a>
-            <span>Share: TW / LI</span>
-        </footer>
+    {% if page.featured_image %}
+    <div class="post-featured-image" data-aos="fade-up">
+        <div class="container">
+            {% image page.featured_image width-1200 as feat_img %}
+            <img src="{{ feat_img.url }}" alt="{{ page.title }}" loading="lazy">
+        </div>
     </div>
+    {% endif %}
+
+    <div class="post-body">
+        <div class="container">
+            <div class="post-content">
+                {% for block in page.body %}
+                {% include_block block %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <footer class="post-footer" data-aos="fade-up">
+        <div class="container">
+            <div class="post-share">
+                <span>Share this article:</span>
+                <div class="share-links">
+                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"
+                        target="_blank" class="share-btn"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}" target="_blank"
+                        class="share-btn"><i class="fab fa-twitter"></i></a>
+                    <a href="https://www.linkedin.com/shareArticle?url={{ request.build_absolute_uri }}" target="_blank"
+                        class="share-btn"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
 </article>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .post-hero {
+        padding: 80px 0 40px;
+    }
+
+    .post-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .blog-tag {
+        background: rgba(0, 212, 255, 0.1);
+        color: var(--primary);
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .blog-date {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+    }
+
+    .post-hero h1 {
+        font-size: clamp(2rem, 4vw, 3.2rem);
+        font-weight: 800;
+        margin-bottom: 16px;
+        max-width: 800px;
+    }
+
+    .post-intro {
+        color: var(--text-muted);
+        font-size: 1.15rem;
+        max-width: 700px;
+    }
+
+    .post-featured-image {
+        padding: 0 0 40px;
+    }
+
+    .post-featured-image img {
+        border-radius: var(--radius);
+        width: 100%;
+        max-height: 500px;
+        object-fit: cover;
+    }
+
+    .post-body {
+        padding-bottom: 60px;
+    }
+
+    .post-content {
+        max-width: 760px;
+        margin: 0 auto;
+    }
+
+    .post-content p {
+        color: var(--text-muted);
+        line-height: 1.9;
+        margin-bottom: 20px;
+        font-size: 1.05rem;
+    }
+
+    .post-content h2,
+    .post-content h3 {
+        margin: 40px 0 16px;
+    }
+
+    .post-content img {
+        border-radius: 8px;
+        margin: 24px 0;
+    }
+
+    .post-footer {
+        padding: 40px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .post-share {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        max-width: 760px;
+        margin: 0 auto;
+    }
+
+    .post-share span {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .share-links {
+        display: flex;
+        gap: 10px;
+    }
+
+    .share-btn {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all var(--transition);
+    }
+
+    .share-btn:hover {
+        background: var(--primary);
+        color: #000;
+        transform: translateY(-2px);
+    }
+</style>
 {% endblock %}

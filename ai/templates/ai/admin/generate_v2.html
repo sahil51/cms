@@ -1,0 +1,451 @@
+{% extends "wagtailadmin/base.html" %}
+{% load i18n wagtailadmin_tags %}
+
+{% block extra_css %}
+{{ block.super }}
+<link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+<style>
+    :root {
+        --customizer-sidebar-width: 400px;
+        --sidebar-bg: rgba(10, 10, 10, 0.85);
+        --sidebar-text: #f0f0f0;
+        --accent: #00ff88;
+        --accent-hover: #00e67a;
+        --border: rgba(255, 255, 255, 0.05);
+        --input-bg: rgba(255, 255, 255, 0.03);
+        --card-bg: rgba(255, 255, 255, 0.02);
+        --font-main: 'Inter', sans-serif;
+        --font-heading: 'Outfit', sans-serif;
+    }
+
+    /* Full layout management */
+    body,
+    html {
+        margin: 0;
+        padding: 0 !important;
+        height: 100vh;
+        overflow: hidden;
+        background: #000;
+        font-family: var(--font-main);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .customizer-wrapper {
+        display: flex;
+        height: 100vh;
+        width: 100vw;
+        position: fixed;
+        top: 0;
+        left: 0;
+    }
+
+    /* Sidebar Design - Glassmorphism */
+    .customizer-sidebar {
+        width: var(--customizer-sidebar-width);
+        min-width: var(--customizer-sidebar-width);
+        background: var(--sidebar-bg);
+        backdrop-filter: blur(25px) saturate(180%);
+        color: var(--sidebar-text);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        z-index: 100;
+        position: relative;
+        box-shadow: 20px 0 50px rgba(0, 0, 0, 0.8);
+    }
+
+    .customizer-sidebar-scrollable {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 32px 24px;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+    }
+
+    .customizer-header {
+        padding: 32px 24px 24px;
+        background: rgba(0, 0, 0, 0.2);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header-left h1 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: #fff;
+        font-weight: 800;
+        font-family: var(--font-heading);
+        letter-spacing: -0.8px;
+        background: linear-gradient(135deg, #fff 0%, #888 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .header-left p {
+        margin: 4px 0 0;
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.4);
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    .btn-back {
+        background: rgba(255, 255, 255, 0.05);
+        color: #aaa;
+        padding: 8px 14px;
+        border-radius: 8px;
+        font-size: 0.7rem;
+        text-decoration: none;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-back:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        border-color: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+    }
+
+    .form-section {
+        margin-bottom: 40px;
+        background: var(--card-bg);
+        padding: 24px;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+    }
+
+    .form-section h3 {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 2.5px;
+        color: var(--accent);
+        margin-bottom: 24px;
+        font-weight: 800;
+        opacity: 0.8;
+    }
+
+    /* Form elements styling */
+    label {
+        display: block !important;
+        margin-bottom: 10px !important;
+        font-weight: 600 !important;
+        font-size: 0.8rem !important;
+        color: rgba(255, 255, 255, 0.6) !important;
+        letter-spacing: 0.3px;
+    }
+
+    textarea,
+    select {
+        width: 100%;
+        padding: 14px 16px;
+        background: var(--input-bg);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        color: #fff;
+        font-size: 0.9rem;
+        font-family: var(--font-main);
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        margin-bottom: 20px;
+        outline: none;
+    }
+
+    textarea:focus,
+    select:focus {
+        border-color: var(--accent);
+        background: rgba(46, 204, 113, 0.05);
+        box-shadow: 0 0 0 4px rgba(0, 255, 136, 0.1);
+    }
+
+    /* Fixed footer */
+    .customizer-footer {
+        padding: 24px;
+        background: rgba(0, 0, 0, 0.3);
+        border-top: 1px solid var(--border);
+        z-index: 101;
+    }
+
+    .btn-generate {
+        width: 100%;
+        background: var(--accent);
+        color: #000;
+        border: none;
+        height: 54px;
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2);
+    }
+
+    .btn-generate:hover {
+        background: var(--accent-hover);
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 15px 40px rgba(0, 255, 136, 0.3);
+    }
+
+    .btn-export {
+        width: 100%;
+        padding: 14px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.8rem;
+        letter-spacing: 1.5px;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        text-decoration: none;
+        backdrop-filter: blur(5px);
+        margin-top: 10px;
+    }
+
+    .btn-export:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Preview container */
+    .customizer-preview {
+        flex-grow: 1;
+        background: #050505;
+        position: relative;
+        z-index: 1;
+        padding: 20px;
+    }
+
+    .preview-iframe {
+        width: 100%;
+        height: 100%;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        background: #fff;
+        transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .preview-loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        opacity: 0;
+        transition: all 0.4s;
+        z-index: 2;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(20px);
+        padding: 40px 60px;
+        border-radius: 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        border: 1px solid rgba(0, 255, 136, 0.2);
+        box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
+    }
+
+    .form-loading .preview-loading {
+        opacity: 1;
+    }
+
+    .ai-status {
+        font-size: 1.1rem;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        font-weight: 900;
+        font-family: var(--font-heading);
+    }
+
+    .ai-subtext {
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    /* Wagtail Conflict Fixes */
+    #wagtail-sidebar,
+    .sidebar,
+    .wagtail-sidebar {
+        display: none !important;
+    }
+
+    #main,
+    main,
+    .content-wrapper,
+    .wrapper {
+        margin-left: 0 !important;
+        padding: 0 !important;
+    }
+</style>
+{% endblock %}
+
+{% block titletag %}AI Theme Generator{% endblock %}
+
+{% block content %}
+<div class="customizer-wrapper">
+    <aside class="customizer-sidebar">
+        <header class="customizer-header">
+            <div class="header-left">
+                <h1>AI Generator</h1>
+                <p>Powered by Gemini 2.0</p>
+            </div>
+            <a href="{% url 'wagtailadmin_home' %}" class="btn-back">Dashboard</a>
+        </header>
+
+        <div class="customizer-sidebar-scrollable">
+            <form id="ai-generate-form" action="" method="POST">
+                {% csrf_token %}
+
+                <div class="form-section">
+                    <h3>Target Selection</h3>
+                    <div class="field">
+                        <label for="page_id">Target Page</label>
+                        <select name="page_id" id="page_id" data-selected-id="{{ selected_page_id }}">
+                            <option value="global">Global Theme (All Pages)</option>
+                            {% for page in pages %}
+                            <option value="{{ page.id }}" data-url="{{ page.url }}">{{ page.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="field" id="section-field" style="display: none;">
+                        <label for="block_id">Target Section</label>
+                        <select name="block_id" id="block_id">
+                            <option value="">Select a section...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Design Prompt</h3>
+                    <div class="field">
+                        <label for="prompt">Describe your vision</label>
+                        <textarea name="prompt" id="prompt" rows="6"
+                            placeholder="e.g. Cyberpunk theme with neon green accents, dark mode, and glitch effects for the hero section...">{{ last_prompt|default:'' }}</textarea>
+                    </div>
+                </div>
+            </form>
+
+            <div class="form-section export-section"
+                style="margin-top: 10px; border-top: 1px solid var(--border); padding-top: 25px;">
+                <h3>Production Export</h3>
+                <p style="font-size: 0.8rem; color: rgba(255, 255, 255, 0.5); margin-bottom: 15px; line-height: 1.4;">
+                    Download a portable, hardcoded version of your site (HTML, CSS, Media).
+                </p>
+                <a href="{% url 'ai_static_export' %}" class="btn-export">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        style="margin-right: 8px;">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                    </svg>
+                    EXPORT STATIC SITE
+                </a>
+            </div>
+        </div>
+
+        <footer class="customizer-footer">
+            <button type="submit" form="ai-generate-form" class="btn-generate">
+                <span id="submit-label">GENERATE THEME</span>
+            </button>
+        </footer>
+    </aside>
+
+    <main class="customizer-preview">
+        <iframe id="preview" src="{{ preview_url|default:'/' }}" class="preview-iframe"></iframe>
+        <div class="preview-loading">
+            <div class="ai-status">AI Processing</div>
+            <div class="ai-subtext">Designing your theme...</div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('ai-generate-form');
+        const iframe = document.getElementById('preview');
+        const pageSelect = document.getElementById('page_id');
+        const sectionField = document.getElementById('section-field');
+        const sectionSelect = document.getElementById('block_id');
+        const submitLabel = document.getElementById('submit-label');
+        const wrapper = document.querySelector('.customizer-wrapper');
+
+        // Initialize Selection from Data Attribute
+        const selectedId = pageSelect.getAttribute('data-selected-id');
+        if (selectedId) {
+            pageSelect.value = selectedId;
+            // Trigger change event to setup initial UI state (section field, etc)
+            pageSelect.dispatchEvent(new Event('change'));
+        }
+
+        // Handle Page Selection Change
+        pageSelect.addEventListener('change', function () {
+            const pageId = this.value;
+
+            if (pageId === 'global') {
+                sectionField.style.display = 'none';
+                submitLabel.textContent = 'Generate Global Theme';
+                sectionSelect.required = false;
+                iframe.src = '/';
+            } else {
+                sectionField.style.display = 'block';
+                submitLabel.textContent = 'Generate Section Theme';
+                sectionSelect.required = true;
+
+                // Update preview URL instantly
+                const selectedOption = this.options[this.selectedIndex];
+                const pageUrl = selectedOption.getAttribute('data-url');
+                if (pageUrl) {
+                    iframe.src = pageUrl;
+                }
+
+                // Fetch sections for this page
+                fetch(`/admin/ai-generate/api/sections/${pageId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        sectionSelect.innerHTML = '<option value="">Select a section...</option>';
+                        data.sections.forEach(section => {
+                            const option = document.createElement('option');
+                            option.value = section.id;
+                            option.textContent = section.label;
+                            sectionSelect.appendChild(option);
+                        });
+                    });
+            }
+        });
+
+        // Loading State
+        form.addEventListener('submit', function () {
+            wrapper.classList.add('form-loading');
+            iframe.classList.add('loading');
+        });
+
+        iframe.addEventListener('load', function () {
+            wrapper.classList.remove('form-loading');
+            iframe.classList.remove('loading');
+        });
+    });
+</script>
+{% endblock %}

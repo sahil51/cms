@@ -1,18 +1,29 @@
-<section class="bold-services-v1 py-24" style="background-color: var(--background-color);">
-    <div class="container mx-auto px-6">
-        <h2 class="text-7xl font-black uppercase mb-20 border-b-16 border-primary pb-8 inline-block"
-            data-aos="fade-right">{{ self.title }}</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-0 border-8 border-black">
-            {% for item in self.services %}
-            <div class="p-12 border-4 border-black group hover:bg-primary hover:text-white transition-colors"
-                data-aos="zoom-in">
-                <div class="text-6xl font-black mb-8 opacity-20 group-hover:opacity-100">0{{ forloop.counter }}</div>
-                <h3 class="text-3xl font-black uppercase mb-6">{{ item.name }}</h3>
-                <p class="text-xl font-bold opacity-70 group-hover:opacity-100 mb-8">{{ item.description }}</p>
-                {% if item.link %}
-                <a href="{{ item.link }}"
-                    class="inline-block bg-black text-white px-6 py-3 text-sm font-black uppercase tracking-tighter hover:bg-white hover:text-black transition-all">
-                    {{ item.cta_text|default:"Learn More" }}!
+{% load wagtailimages_tags %}
+<section class="services-section" {% if self.section_id %}id="{{ self.section_id }}" {% endif %}
+    data-aos="{{ self.animation|default:'fade-up' }}">
+    <div class="container">
+        <div class="section-header" data-aos="fade-up">
+            <span class="section-tag"><i class="fa-solid fa-shield-halved"></i> Our Services</span>
+            <h2>{{ self.title }}</h2>
+            {% if self.subtitle %}<p class="section-subtitle">{{ self.subtitle }}</p>{% endif %}
+        </div>
+        <div class="services-grid">
+            {% for service in self.services %}
+            <div class="service-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}00">
+                <div class="service-icon-area">
+                    {% if service.image %}
+                    {% image service.image fill-400x300 as svc_img %}
+                    <div class="service-img" style="background-image:url('{{ svc_img.url }}');"></div>
+                    {% endif %}
+                    <div class="service-icon">
+                        <i class="fa-solid {{ service.icon|default:'fa-shield-halved' }}"></i>
+                    </div>
+                </div>
+                <h3>{{ service.name }}</h3>
+                <p>{{ service.description }}</p>
+                {% if service.cta_text %}
+                <a href="{{ service.link|default:'#' }}" class="service-link">
+                    {{ service.cta_text }} <i class="fa-solid fa-arrow-right"></i>
                 </a>
                 {% endif %}
             </div>
@@ -20,3 +31,108 @@
         </div>
     </div>
 </section>
+
+<style>
+    .section-header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+    .section-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--primary);
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 12px;
+    }
+
+    .section-header h2 {
+        font-size: clamp(1.8rem, 3vw, 2.8rem);
+        font-weight: 800;
+        margin-bottom: 12px;
+    }
+
+    .section-subtitle {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 32px;
+    }
+
+    .service-card {
+        background: var(--bg-card);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: var(--radius);
+        padding: 32px;
+        position: relative;
+        transition: all var(--transition);
+        overflow: hidden;
+    }
+
+    .service-card:hover {
+        border-color: rgba(0, 212, 255, 0.2);
+        transform: translateY(-4px);
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+    }
+
+    .service-icon-area {
+        margin-bottom: 20px;
+    }
+
+    .service-img {
+        height: 200px;
+        background-size: cover;
+        background-position: center;
+        border-radius: 8px;
+        margin-bottom: 16px;
+    }
+
+    .service-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        background: rgba(0, 212, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        color: var(--primary);
+    }
+
+    .service-card h3 {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin: 16px 0 8px;
+    }
+
+    .service-card p {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        line-height: 1.7;
+        margin-bottom: 16px;
+    }
+
+    .service-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--primary);
+        font-weight: 700;
+        font-size: 0.9rem;
+        transition: all var(--transition);
+    }
+
+    .service-link:hover {
+        gap: 12px;
+    }
+</style>

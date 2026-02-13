@@ -1,9 +1,12 @@
 import json
 import logging
 import os
+from dotenv import load_dotenv
 from google import genai
 from django.core.exceptions import ValidationError
-from pages.models import ThemeConfig
+from pages.models import ThemeSettings, ContentPage
+
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
@@ -12,34 +15,61 @@ ALLOWED_VARIANTS = ['v1', 'v2', 'v3']
 
 class ThemeMutationService:
     @staticmethod
-    def get_gemini_design(prompt):
+    def get_gemini_design(prompt, site=None, page_titles=None):
         """Calls Gemini API with fallback models to get a structured design JSON using modern SDK."""
         api_key = os.getenv('GEMINI_API_KEY')
         if not api_key:
+            logger.error("GEMINI_API_KEY is missing from environment.")
             raise ValidationError("GEMINI_API_KEY not configured in environment.")
+        
+        # Site-specific context
+        site_name = "this project"
+        if site:
+            try:
+                from .models import SiteSettings
+                settings = SiteSettings.for_site(site)
+                site_name = settings.site_name or site.site_name
+            except Exception:
+                pass
 
         client = genai.Client(api_key=api_key)
         
         # Models to try in order
         fallback_models = [
-            'gemini-2.0-flash',
-            'gemini-2.0-flash-exp',
-            'gemini-1.5-flash',
-            'gemini-1.5-pro'
+            'models/gemini-2.5-flash-lite',
+            'models/gemini-2.5-flash',
+            'models/gemini-3-flash-preview',
         ]
         
-        system_instruction = """
-        You are an expert web designer and copywriter. Based on the user's prompt, generate a conversion-optimized website configuration.
-        Follow this blueprint strictly for section logic:
-        - Hero: Primary CTA (e.g. Get a Quote) AND Secondary CTA (e.g. Call Us Link).
-        - Services: Each service must have a clear 'Learn More' CTA.
-        - Trust: Include Partner logos and Success Stories.
-        - Lead Magnet: A section specifically to 'Download Free Guide' or similar offer.
+        system_instruction = f"""
+        You are a Senior UI/UX Designer and Conversion Strategist for '{site_name}'.
+        Your goal is to generate a sophisticated, conversion-optimized design system blueprint that fits this specific project's identity.
+
+        ### Project Structure (Pages):
+        The project currently contains the following core pages:
+        {', '.join(page_titles) if page_titles else 'Multiple modular content pages'}
         
-        Respond ONLY with a valid JSON object.
+        ### Project Architecture (Available Blocks):
+        You are modifying a high-end CMS built with the following components:
+        1. Hero & Carousel Hero (Above-the-fold impact)
+        2. About, Services, & Industries (Content layers)
+        3. Why Choose Us & Process Steps (Value props)
+        4. Trust Bar, Testimonials, & Success Stories (Social proof)
+        5. Lead Magnet, Lead Form, & CTAs (Conversion anchors)
+        6. Gallery & Documents (Resource layers)
+
+        ### Design Principles to Enforce:
+        1. Visual Hierarchy: Establish a clear F-pattern layout. Use intentional contrast to guide the user's eye.
+        2. Color Theory: Apply professional color harmonies. Ensure WCAG-compliant contrast.
+        3. Typography: Pair fonts that evoke 'Trust', 'Authority', and 'Modernity'. 
+        4. Spatial System: Implement rhythmic whitespace (the 8pt grid system).
+        5. Component Logic: Use 'Primary Action Emphasis' for quotes and 'Secondary Ghost Buttons' for indirect contact.
+
+        ### Technical Response Format:
+        Respond ONLY with a valid JSON object. No prose.
         
         The JSON schema must be:
-        {
+        {{
             "base_theme": "modern" | "minimal" | "bold",
             "primary_color": "Hex color",
             "secondary_color": "Hex color",
@@ -49,12 +79,12 @@ class ThemeMutationService:
             "about_variant": "v1" | "v2" | "v3",
             "services_variant": "v1" | "v2" | "v3",
             "faq_variant": "v1" | "v2" | "v3",
-            "typography": {
-                "heading_font": "Font Name",
-                "body_font": "Font Name"
-            },
+            "typography": {{
+                "heading_font": "Google Font Name (e.g., Outfit, Inter, Roboto)",
+                "body_font": "Google Font Name (e.g., Outfit, Inter, Roboto)"
+            }},
             "animation_preset": "smooth-fade" | "parallax" | "bounce" | "slide" | "none"
-        }
+        }}
         """
         
         last_error = None
@@ -103,7 +133,7 @@ class ThemeMutationService:
                      raise ValidationError(f"Invalid color format for {color_key}")
 
     @staticmethod
-    def apply_targeted_mutation(prompt, page_id, block_id):
+    def apply_targeted_mutation(prompt, page_id, block_id, site=None):
         """
         Calls Gemini to get a mutation for a SPECIFIC block on a SPECIFIC page.
         """
@@ -120,17 +150,33 @@ class ThemeMutationService:
         if not target_block:
             raise ValidationError(f"Block with ID {block_id} not found on page {page_id}")
 
+        # Site-specific context for targeted mutation
+        site_name = "this project"
+        if site:
+            try:
+                from .models import SiteSettings
+                settings = SiteSettings.for_site(site)
+                site_name = settings.site_name or site.site_name
+            except Exception:
+                pass
+
         # Construct a specialized prompt for a single block
         system_instruction = f"""
-        You are a conversion-optimized web designer. Generate content for a {target_block.block_type} section.
-        Follow these specific structural rules:
-        - Hero: Must have a primary 'Call to Action' and a secondary 'Contact' link.
-        - Services: Each service must have a 'Learn More' link.
-        - Lead Magnet: Focus on a specific offer like 'Download Free Guide'.
-        - Success Story: Highlight specific client names and story titles.
-        - Partners: Display logos of trusted collaborators.
+        You are a Senior UI/UX Designer for '{site_name}'. 
+        Generate a conversion-optimized payload for the '{target_block.block_type}' section on the '{page.title}' page.
+
+        ### Section-Specific UX Psychology:
+        - Hero: Frictionless CTAs. Focus on above-the-fold impact for '{site_name}'.
+        - Services: Micro-copy that highlights 'Value'. entry point for '{page.title}'.
+        - Lead Magnet: Authritative and premium.
+        - Success Story: Authenticity. data-driven story titles.
+        - Trust Bar: 'Echo of Authority'. premium corporate feel.
         
-        Respond ONLY with a valid JSON object matching the section's fields.
+        ### Copywriting Rules:
+        - Be direct, professional, and authoritative.
+        - Use context from the project name '{site_name}' and page '{page.title}'.
+        
+        Respond ONLY with a valid JSON object matching the section's JSON schema fields exactly.
         """
         
         # We can reuse get_gemini_design since it now handles the system_instruction correctly via config
@@ -139,7 +185,7 @@ class ThemeMutationService:
         client = genai.Client(api_key=api_key)
         
         response = client.models.generate_content(
-            model='gemini-2.0-flash',
+            model='models/gemini-2.5-flash-lite',
             contents=prompt,
             config={
                 'system_instruction': system_instruction,
@@ -161,21 +207,27 @@ class ThemeMutationService:
         return page
 
     @staticmethod
-    def apply_mutation(prompt, ai_json_str=None):
+    def apply_mutation(prompt, ai_json_str=None, site=None, page_titles=None):
         """
         Parses AI JSON string, validates it, and updates the tenant's ThemeConfig.
         If ai_json_str is None, it calls Gemini to get it.
         """
         try:
             if ai_json_str is None:
-                ai_json_str = ThemeMutationService.get_gemini_design(prompt)
+                ai_json_str = ThemeMutationService.get_gemini_design(prompt, site=site, page_titles=page_titles)
 
             data = json.loads(ai_json_str)
             ThemeMutationService.validate_theme_json(data)
             
-            config = ThemeConfig.objects.first()
-            if not config:
-                config = ThemeConfig()
+            if not site:
+                from wagtail.models import Site
+                site = Site.objects.filter(is_default_site=True).first()
+                if not site:
+                    site = Site.objects.first()
+            
+            # Use for_site to get the correct setting for this authenticated site
+            # This handles getting or creating the setting for the specific site
+            config = ThemeSettings.for_site(site)
             
             config.base_theme = data.get('base_theme', config.base_theme)
             config.primary_color = data.get('primary_color', config.primary_color)

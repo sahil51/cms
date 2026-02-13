@@ -1,13 +1,20 @@
 from django import template
-from pages.models import ThemeConfig
+from pages.models import ThemeSettings
 
 register = template.Library()
 
-@register.simple_tag
-def get_theme_config():
-    """Returns the current tenant's ThemeConfig."""
+@register.simple_tag(takes_context=True)
+def get_theme_config(context):
+    """Returns the current site's ThemeSettings with fallback."""
     try:
-        return ThemeConfig.objects.first()
+        from wagtail.models import Site
+        request = context.get('request')
+        site = getattr(request, 'site', None)
+        
+        if not site:
+            site = Site.objects.get(is_default_site=True)
+            
+        return ThemeSettings.for_site(site)
     except Exception:
         return None
 @register.simple_tag
@@ -39,9 +46,16 @@ def get_menu(slug):
 
 @register.simple_tag(takes_context=True)
 def get_site_settings(context):
-    """Returns the current site's SiteSettings."""
+    """Returns the current site's SiteSettings with fallback."""
     try:
+        from wagtail.models import Site
         from pages.models import SiteSettings
-        return SiteSettings.for_site(context['request'].site)
+        request = context.get('request')
+        site = getattr(request, 'site', None)
+        
+        if not site:
+            site = Site.objects.get(is_default_site=True)
+            
+        return SiteSettings.for_site(site)
     except Exception:
         return None

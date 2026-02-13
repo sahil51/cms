@@ -1,0 +1,56 @@
+{% load wagtailimages_tags %}
+<section class="trust-bar-section" {% if self.section_id %}id="{{ self.section_id }}" {% endif %}
+    data-aos="{{ self.animation|default:'fade-up' }}">
+    <div class="container">
+        {% if self.title %}<p class="trust-label">{{ self.title }}</p>{% endif %}
+        <div class="trust-logos">
+            {% for item in self.logos %}
+            <div class="trust-logo" data-aos="zoom-in" data-aos-delay="{{ forloop.counter0|add:1 }}00">
+                {% if item.link %}<a href="{{ item.link }}" target="_blank">{% endif %}
+                    {% image item.logo height-60 as logo_img %}
+                    <img src="{{ logo_img.url }}" alt="{{ item.name }}" loading="lazy">
+                    {% if item.link %}</a>{% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<style>
+    .trust-bar-section {
+        padding: 48px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.04);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .trust-label {
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        margin-bottom: 32px;
+    }
+
+    .trust-logos {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 48px;
+    }
+
+    .trust-logo img {
+        height: 48px;
+        width: auto;
+        filter: grayscale(100%) brightness(0.6);
+        opacity: 0.5;
+        transition: all var(--transition);
+    }
+
+    .trust-logo:hover img {
+        filter: grayscale(0%) brightness(1);
+        opacity: 1;
+    }
+</style>

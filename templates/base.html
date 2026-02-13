@@ -6,230 +6,442 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{{ page.title }}{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}{{ page.search_description }}{% endblock %}">
 
     {% get_theme_config as config %}
+    {% get_site_settings as settings %}
+
+    <!-- Google Fonts -->
+    <link href="{% get_google_fonts_url config %}" rel="stylesheet">
+    <!-- FontAwesome 6 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <!-- AOS Animations -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Swiper CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" rel="stylesheet">
+
     <style>
         :root {
-            --primary-color: {
-                    {
-                    config.primary_color|default: "#6C63FF"
-                }
-            }
+            --primary: {{ config.primary_color|default:"#00D4FF" }};
+            --secondary: {{ config.secondary_color|default:"#FF6B35" }};
+            --bg: {{ config.background_color|default:"#0A0E17" }};
+            --bg-card: #111827;
+            --text: {{ config.text_color|default:"#FFFFFF" }};
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --heading-font: '{{ config.heading_font|default:"Inter" }}', sans-serif;
+            --body-font: '{{ config.body_font|default:"Inter" }}', sans-serif;
+            --radius: 12px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-            ;
-
-            ;
-
-            --secondary-color: {
-                    {
-                    config.secondary_color|default: "#FF6584"
-                }
-            }
-
-            ;
-
-            ;
-
-            --background-color: {
-                    {
-                    config.background_color|default: "#0F172A"
-                }
-            }
-
-            ;
-
-            ;
-
-            --text-color: {
-                    {
-                    config.text_color|default: "#FFFFFF"
-                }
-            }
-
-            ;
-
-            ;
-            --heading-font: '{{ config.heading_font|default:"Poppins" }}',
-            sans-serif;
-            --body-font: '{{ config.body_font|default:"Inter" }}',
-            sans-serif;
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            background-color: var(--background-color);
-            color: var(--text-color);
+            background: var(--bg);
+            color: var(--text);
             font-family: var(--body-font);
-            margin: 0;
-            padding: 0;
+            line-height: 1.7;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6 {
+        h1, h2, h3, h4, h5, h6 {
             font-family: var(--heading-font);
-            margin-top: 0;
+            line-height: 1.2;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1rem;
-        }
+        a { color: inherit; text-decoration: none; }
+        img { max-width: 100%; height: auto; }
+        .container { max-width: 1240px; margin: 0 auto; padding: 0 20px; }
+        section { padding: 80px 0; }
 
-        section {
-            padding: 80px 0;
-        }
-
+        /* =============== BUTTON SYSTEM =============== */
         .btn {
-            display: inline-block;
-            padding: 12px 24px;
-            border-radius: 8px;
-            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 32px;
+            border-radius: var(--radius);
             font-weight: 700;
-            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            cursor: pointer;
+            border: none;
+            transition: all var(--transition);
+            text-decoration: none;
+            letter-spacing: 0.02em;
+        }
+        .btn-primary { background: var(--primary); color: #000; box-shadow: 0 4px 24px rgba(0, 212, 255, 0.3); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0, 212, 255, 0.5); }
+        .btn-secondary { background: transparent; color: var(--text); border: 2px solid rgba(255, 255, 255, 0.2); }
+        .btn-secondary:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-danger { background: var(--secondary); color: #fff; box-shadow: 0 4px 24px rgba(255, 107, 53, 0.3); }
+        .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(255, 107, 53, 0.5); }
+
+        /* =============== ANNOUNCEMENT BAR =============== */
+        .announcement-bar {
+            background: var(--primary);
+            color: #000;
+            text-align: center;
+            padding: 8px 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+        .announcement-bar a { color: #000; text-decoration: underline; margin-left: 8px; }
+
+        /* =============== HEADER =============== */
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(10, 14, 23, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all var(--transition);
+        }
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            gap: 24px;
+        }
+        .logo-area { display: flex; align-items: center; gap: 10px; }
+        .logo-area img { height: 42px; width: auto; }
+        .logo-text { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+        .logo-text span { color: var(--primary); }
+
+        .nav-links { display: flex; align-items: center; gap: 28px; list-style: none; }
+        .nav-links a {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: color var(--transition);
+            position: relative;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width var(--transition);
+        }
+        .nav-links a:hover { color: var(--text); }
+        .nav-links a:hover::after { width: 100%; }
+
+        .header-actions { display: flex; align-items: center; gap: 16px; }
+        .header-phone { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 0.9rem; color: var(--primary); }
+        .emergency-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 107, 53, 0.15);
+            border: 1px solid var(--secondary);
+            color: var(--secondary);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            animation: pulse-badge 2s ease-in-out infinite;
+        }
+        @keyframes pulse-badge {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.3); }
+            50% { box-shadow: 0 0 0 8px rgba(255, 107, 53, 0); }
+        }
+
+        /* =============== MOBILE MENU =============== */
+        .mobile-toggle { display: none; background: none; border: none; color: var(--text); font-size: 1.5rem; cursor: pointer; padding: 8px; }
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 320px;
+            height: 100vh;
+            background: #0d1117;
+            z-index: 2000;
+            padding: 80px 32px 32px;
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+        }
+        .mobile-menu.open { right: 0; }
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .mobile-overlay.open { display: block; opacity: 1; }
+        .mobile-menu-close { position: absolute; top: 24px; right: 24px; background: none; border: none; color: var(--text); font-size: 1.5rem; cursor: pointer; }
+        .mobile-menu a {
+            display: block;
+            padding: 16px 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all var(--transition);
+        }
+        .mobile-menu a:hover { color: var(--primary); padding-left: 12px; }
+
+        /* =============== FLOATING CALL BUTTON (Mobile) =============== */
+        .floating-call {
+            display: none;
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 999;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--secondary);
+            color: #fff;
+            font-size: 1.4rem;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            box-shadow: 0 8px 32px rgba(255, 107, 53, 0.5);
+            animation: float-bounce 3s ease-in-out infinite;
             cursor: pointer;
         }
-
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
+        @keyframes float-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
         }
 
-        .btn-primary:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
+        /* =============== FOOTER =============== */
+        .site-footer { background: #060911; border-top: 1px solid rgba(255, 255, 255, 0.05); padding: 80px 0 0; }
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
+        .footer-brand p { color: var(--text-muted); line-height: 1.8; margin: 16px 0 24px; max-width: 360px; }
+        .footer-heading { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 20px; color: var(--text); }
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 12px; }
+        .footer-links a { color: var(--text-muted); font-size: 0.9rem; transition: all var(--transition); }
+        .footer-links a:hover { color: var(--primary); padding-left: 4px; }
+        .footer-social { display: flex; gap: 10px; }
+        .footer-social a {
+            width: 42px; height: 42px; border-radius: 50%; background: rgba(255, 255, 255, 0.05);
+            display: flex; align-items: center; justify-content: center; font-size: 1rem; transition: all var(--transition);
+        }
+        .footer-social a:hover { background: var(--primary); color: #000; transform: translateY(-3px); }
+        .footer-bottom { border-top: 1px solid rgba(255, 255, 255, 0.05); padding: 24px 0; text-align: center; color: var(--text-muted); font-size: 0.8rem; }
+
+        /* =============== RESPONSIVE =============== */
+        @media (max-width: 1024px) {
+            .nav-links, .header-phone, .emergency-badge, .header-actions .btn { display: none; }
+            .mobile-toggle { display: block; }
+            .floating-call { display: flex; }
+            .mobile-menu { display: block; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 640px) {
+            section { padding: 48px 0; }
+            .footer-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 2.2rem; }
+            h2 { font-size: 1.8rem; }
         }
     </style>
-
-    <!-- AOS for animations -->
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <!-- FontAwesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- Dynamic Google Fonts -->
-    <link href="{% get_google_fonts_url config %}" rel="stylesheet">
 
     {% block extra_css %}{% endblock %}
 </head>
 
 <body class="{% block body_class %}{% endblock %}">
-    {% get_site_settings as settings %}
     {% get_menu 'main' as main_menu %}
 
-    <nav class="navbar py-4 border-b border-white/10 sticky top-0 bg-slate-900/80 backdrop-blur-md z-50">
-        <div class="container mx-auto flex items-center justify-between">
-            <a href="/" class="flex items-center gap-3">
-                {% if settings.logo %}
-                {% image settings.logo height-40 as logo_img %}
-                <img src="{{ logo_img.url }}" alt="Logo" class="h-10">
-                {% else %}
-                <span class="text-2xl font-black uppercase tracking-tighter text-primary">CMS<span
-                        class="text-secondary">.</span></span>
-                {% endif %}
-            </a>
+    <!-- Announcement Bar -->
+    {% if settings.announcement_text %}
+    <div class="announcement-bar">
+        <i class="fa-solid fa-bell"></i>
+        {{ settings.announcement_text }}
+        {% if settings.announcement_link %}
+        <a href="{{ settings.announcement_link }}">Learn More &rarr;</a>
+        {% endif %}
+    </div>
+    {% endif %}
 
-            <div class="hidden md:flex items-center gap-8">
-                {% if main_menu %}
-                {% for item in main_menu.menu_items.all %}
-                {% if item.open_in_new_tab %}
-                <a href="{{ item.link }}"
-                    class="text-sm font-bold uppercase tracking-widest hover:text-primary transition-colors"
-                    target="_blank">
-                    {{ item.title }}
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container">
+            <div class="header-inner">
+                <a href="/" class="logo-area">
+                    {% if settings.logo %}
+                    {% image settings.logo height-42 as logo_img %}
+                    <img src="{{ logo_img.url }}" alt="{{ settings.site_name|default:'Logo' }}">
+                    {% else %}
+                    <div class="logo-text">Secure<span>Guard</span></div>
+                    {% endif %}
                 </a>
-                {% else %}
-                <a href="{{ item.link }}"
-                    class="text-sm font-bold uppercase tracking-widest hover:text-primary transition-colors">
-                    {{ item.title }}
-                </a>
-                {% endif %}
-                {% endfor %}
-                {% endif %}
 
-                <!-- Search Bar -->
-                <form action="/search/" method="get" class="relative group">
-                    <input type="text" name="query" placeholder="Search..."
-                        class="bg-white/5 border border-white/10 rounded-full px-4 py-1 text-sm focus:outline-none focus:border-primary transition-all w-32 group-hover:w-48 text-white">
-                    <button type="submit"
-                        class="absolute right-3 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100">
-                        <i class="fa fa-search"></i>
+                <nav>
+                    <ul class="nav-links">
+                        {% if main_menu %}
+                        {% for item in main_menu.menu_items.all %}
+                        <li><a href="{{ item.link }}" {% if item.open_in_new_tab %}target="_blank" {% endif %}>{{ item.title }}</a></li>
+                        {% endfor %}
+                        {% endif %}
+                    </ul>
+                </nav>
+
+                <div class="header-actions">
+                    {% if settings.emergency_badge_text %}
+                    <span class="emergency-badge">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        {{ settings.emergency_badge_text }}
+                    </span>
+                    {% endif %}
+
+                    {% if settings.phone_number %}
+                    <a href="tel:{{ settings.phone_number }}" class="header-phone">
+                        <i class="fa-solid fa-phone-volume"></i>
+                        {{ settings.phone_number }}
+                    </a>
+                    {% endif %}
+
+                    {% if settings.header_cta_text %}
+                    <a href="{{ settings.header_cta_link|default:'#' }}" class="btn btn-primary">
+                        {{ settings.header_cta_text }}
+                    </a>
+                    {% endif %}
+
+                    <button class="mobile-toggle" onclick="toggleMobileMenu()" aria-label="Open menu">
+                        <i class="fa-solid fa-bars"></i>
                     </button>
-                </form>
+                </div>
             </div>
         </div>
-    </nav>
+    </header>
 
+    <!-- Mobile Menu -->
+    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleMobileMenu()"></div>
+    <div class="mobile-menu" id="mobileMenu">
+        <button class="mobile-menu-close" onclick="toggleMobileMenu()" aria-label="Close menu">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        {% if main_menu %}
+        {% for item in main_menu.menu_items.all %}
+        <a href="{{ item.link }}" {% if item.open_in_new_tab %}target="_blank" {% endif %}>{{ item.title }}</a>
+        {% endfor %}
+        {% endif %}
+        {% if settings.phone_number %}
+        <a href="tel:{{ settings.phone_number }}" style="color:var(--primary);margin-top:24px;">
+            <i class="fa-solid fa-phone-volume"></i> {{ settings.phone_number }}
+        </a>
+        {% endif %}
+        {% if settings.header_cta_text %}
+        <a href="{{ settings.header_cta_link|default:'#' }}" class="btn btn-primary" style="margin-top:24px;text-align:center;">
+            {{ settings.header_cta_text }}
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Main Content -->
     <main>
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="py-20 border-t border-white/10 bg-black/20">
-        <div class="container mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 text-left">
-            <div class="md:col-span-2">
-                <h3 class="text-2xl font-black mb-6 uppercase">About Us</h3>
-                <p class="opacity-50 max-w-sm leading-relaxed mb-8">
-                    We empower creators and businesses with AI-driven web solutions.
-                    Build your professional presence in minutes.
-                </p>
-                <div class="flex gap-4">
-                    {% if settings.facebook_url %}
-                    <a href="{{ settings.facebook_url }}"
-                        class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary transition-all"><i
-                            class="fab fa-facebook-f"></i></a>
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    {% if settings.logo %}
+                    {% image settings.logo height-42 as footer_logo %}
+                    <img src="{{ footer_logo.url }}" alt="{{ settings.site_name|default:'Logo' }}">
+                    {% else %}
+                    <div class="logo-text" style="font-size:1.8rem;margin-bottom:8px;">Secure<span>Guard</span></div>
                     {% endif %}
-                    {% if settings.twitter_url %}
-                    <a href="{{ settings.twitter_url }}"
-                        class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary transition-all"><i
-                            class="fab fa-twitter"></i></a>
-                    {% endif %}
-                    {% if settings.instagram_url %}
-                    <a href="{{ settings.instagram_url }}"
-                        class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary transition-all"><i
-                            class="fab fa-instagram"></i></a>
-                    {% endif %}
-                    {% if settings.linkedin_url %}
-                    <a href="{{ settings.linkedin_url }}"
-                        class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary transition-all"><i
-                            class="fab fa-linkedin-in"></i></a>
-                    {% endif %}
+                    <p>Professional security solutions for homes and businesses. CCTV, alarm systems, access control, and 24/7 monitoring services you can trust.</p>
+                    <div class="footer-social">
+                        {% if settings.facebook_url %}<a href="{{ settings.facebook_url }}" target="_blank"><i class="fab fa-facebook-f"></i></a>{% endif %}
+                        {% if settings.twitter_url %}<a href="{{ settings.twitter_url }}" target="_blank"><i class="fab fa-twitter"></i></a>{% endif %}
+                        {% if settings.instagram_url %}<a href="{{ settings.instagram_url }}" target="_blank"><i class="fab fa-instagram"></i></a>{% endif %}
+                        {% if settings.linkedin_url %}<a href="{{ settings.linkedin_url }}" target="_blank"><i class="fab fa-linkedin-in"></i></a>{% endif %}
+                        {% if settings.youtube_url %}<a href="{{ settings.youtube_url }}" target="_blank"><i class="fab fa-youtube"></i></a>{% endif %}
+                    </div>
+                </div>
+                <div>
+                    <div class="footer-heading">Services</div>
+                    <ul class="footer-links">
+                        <li><a href="#">CCTV Systems</a></li>
+                        <li><a href="#">Alarm Systems</a></li>
+                        <li><a href="#">Access Control</a></li>
+                        <li><a href="#">Intercom Systems</a></li>
+                        <li><a href="#">Smoke Detectors</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <div class="footer-heading">Company</div>
+                    <ul class="footer-links">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Service Areas</a></li>
+                        <li><a href="#">Careers</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <div class="footer-heading">Contact Info</div>
+                    <ul class="footer-links">
+                        {% if settings.phone_number %}
+                        <li><a href="tel:{{ settings.phone_number }}"><i class="fa-solid fa-phone" style="color:var(--primary);margin-right:8px;"></i>{{ settings.phone_number }}</a></li>
+                        {% endif %}
+                        {% if settings.email_address %}
+                        <li><a href="mailto:{{ settings.email_address }}"><i class="fa-solid fa-envelope" style="color:var(--primary);margin-right:8px;"></i>{{ settings.email_address }}</a></li>
+                        {% endif %}
+                        {% if settings.address %}
+                        <li style="color:var(--text-muted);line-height:1.6;"><i class="fa-solid fa-location-dot" style="color:var(--primary);margin-right:8px;"></i>{{ settings.address }}</li>
+                        {% endif %}
+                    </ul>
                 </div>
             </div>
-            <div>
-                <h3 class="text-xl font-bold mb-6">Contact</h3>
-                <ul class="space-y-4 opacity-70 list-none p-0">
-                    {% if settings.phone_number %}<li><i class="fa fa-phone mr-3 text-primary"></i>{{
-                        settings.phone_number }}</li>{% endif %}
-                    {% if settings.email_address %}<li><i class="fa fa-envelope mr-3 text-primary"></i>{{
-                        settings.email_address }}</li>{% endif %}
-                </ul>
-            </div>
-            <div>
-                <h3 class="text-xl font-bold mb-6">Legal</h3>
-                <ul class="space-y-4 opacity-70 list-none p-0">
-                    <li><a href="#" class="hover:text-primary transition-colors">Terms of Service</a></li>
-                    <li><a href="#" class="hover:text-primary transition-colors">Privacy Policy</a></li>
-                </ul>
-            </div>
         </div>
-        <div class="container mx-auto mt-16 pt-8 border-t border-white/5 text-center text-sm opacity-30">
-            &copy; {% now "Y" %} CMS Builder. All rights reserved.
+        <div class="footer-bottom">
+            <div class="container">
+                &copy; {% now "Y" %} {{ settings.site_name|default:"SecureGuard Pro" }}. All rights reserved. | Professional Security Solutions
+            </div>
         </div>
     </footer>
 
+    <!-- Floating Call Button (Mobile) -->
+    {% if settings.phone_number %}
+    <a href="tel:{{ settings.phone_number }}" class="floating-call" aria-label="Call Now">
+        <i class="fa-solid fa-phone-volume"></i>
+    </a>
+    {% endif %}
+
+    <!-- Scripts -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            AOS.init({
-                duration: 800,
-                easing: 'ease-in-out',
-                once: true,
-            });
+            AOS.init({ duration: 700, easing: 'ease-out-cubic', once: true, offset: 60 });
         });
+
+        function toggleMobileMenu() {
+            var menu = document.getElementById('mobileMenu');
+            var overlay = document.getElementById('mobileOverlay');
+            if (menu) menu.classList.toggle('open');
+            if (overlay) overlay.classList.toggle('open');
+            document.body.style.overflow = (menu && menu.classList.contains('open')) ? 'hidden' : '';
+        }
     </script>
     {% block extra_js %}{% endblock %}
 </body>
-
 </html>

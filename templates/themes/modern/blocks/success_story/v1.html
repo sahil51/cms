@@ -1,73 +1,75 @@
 {% load wagtailimages_tags %}
-<section class="success-story-v1" data-aos="{{ self.animation }}">
+<section class="success-stories-section" {% if self.section_id %}id="{{ self.section_id }}" {% endif %}
+    data-aos="{{ self.animation|default:'fade-up' }}">
     <div class="container">
-        <div class="section-header text-center mb-16">
-            <h2 class="text-4xl font-black uppercase tracking-tight">{{ self.title }}</h2>
+        <div class="section-header" data-aos="fade-up">
+            <span class="section-tag"><i class="fa-solid fa-trophy"></i> Success Stories</span>
+            <h2>{{ self.title }}</h2>
         </div>
         <div class="stories-grid">
-            {% for item in self.stories %}
+            {% for story in self.stories %}
             <div class="story-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}00">
-                <div class="story-image">
-                    {% if item.image %}
-                    {% image item.image fill-800x450 class="w-full h-full object-cover" %}
-                    {% else %}
-                    <div class="w-full h-64 bg-white/5 flex items-center justify-center">
-                        <i class="fa fa-award text-4xl opacity-20"></i>
-                    </div>
-                    {% endif %}
-                </div>
-                <div class="story-content p-8">
-                    <span class="text-xs font-bold uppercase tracking-widest text-secondary mb-2 block">{{
-                        item.client_name }}</span>
-                    <h3 class="text-2xl font-bold mb-4 line-height-tight">{{ item.story_title }}</h3>
-                    <p class="opacity-60 mb-6 line-clamp-3">{{ item.summary }}</p>
-                    {% if item.link %}
-                    <a href="{{ item.link }}"
-                        class="text-sm font-black uppercase tracking-widest hover:text-primary transition-colors flex items-center gap-2">
-                        Read Full Case Study <i class="fa fa-arrow-right text-xs"></i>
-                    </a>
-                    {% endif %}
+                {% if story.image %}{% image story.image fill-400x250 as s_img %}<div class="story-img"
+                    style="background-image:url('{{ s_img.url }}');"></div>{% endif %}
+                <div class="story-content">
+                    <span class="story-client">{{ story.client_name }}</span>
+                    <h3>{{ story.story_title }}</h3>
+                    <p>{{ story.summary }}</p>
+                    {% if story.link %}<a href="{{ story.link }}" class="service-link">Read Case Study <i
+                            class="fa-solid fa-arrow-right"></i></a>{% endif %}
                 </div>
             </div>
             {% endfor %}
         </div>
     </div>
 </section>
-
 <style>
-    .success-story-v1 {
-        padding: 100px 0;
-        background: rgba(0, 0, 0, 0.2);
-    }
-
     .stories-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-        gap: 3rem;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 32px;
     }
 
     .story-card {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 24px;
+        background: var(--bg-card);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: var(--radius);
         overflow: hidden;
-        transition: all 0.3s ease;
+        transition: all var(--transition);
     }
 
     .story-card:hover {
-        transform: translateY(-8px);
-        background: rgba(255, 255, 255, 0.06);
-        border-color: var(--primary-color);
+        transform: translateY(-4px);
+        border-color: rgba(0, 212, 255, 0.2);
     }
 
-    .story-image {
-        height: 250px;
-        position: relative;
+    .story-img {
+        height: 200px;
+        background-size: cover;
+        background-position: center;
     }
 
-    @media (max-width: 640px) {
-        .stories-grid {
-            grid-template-columns: 1fr;
-        }
+    .story-content {
+        padding: 24px;
+    }
+
+    .story-client {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--primary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .story-content h3 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin: 8px 0;
+    }
+
+    .story-content p {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 12px;
     }
 </style>

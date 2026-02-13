@@ -1,25 +1,10 @@
 {% extends "base.html" %}
-{% load wagtailcore_tags %}
+{% load wagtailcore_tags theme_tags %}
+
+{% block title %}{{ page.location_name }} | Service Area{% endblock %}
 
 {% block content %}
-<div class="service-area-page bold-style">
-    {% for block in page.body %}
-    {% include_block block %}
-    {% endfor %}
-</div>
-
-<section class="py-32 bg-primary text-white" style="background-color: var(--primary-color);">
-    <div class="container mx-auto px-6 text-center">
-        <h2 class="text-7xl md:text-9xl font-black uppercase mb-12" data-aos="zoom-in">Dominating {{ page.location_name
-            }}!</h2>
-        <p
-            class="text-3xl font-black uppercase opacity-80 mb-20 max-w-4xl mx-auto border-4 border-black p-8 bg-black text-white">
-            Our specialized forces are deployed across the entire {{ page.location_name }} territory.
-        </p>
-        <a href="{% slugurl 'contact' %}"
-            class="bg-black text-white px-20 py-8 text-4xl font-black uppercase tracking-tighter hover:bg-white hover:text-black transition-all shadow-[15px_15px_0_0_rgba(0,0,0,0.5)]">
-            Deploy Now &rsaquo;
-        </a>
-    </div>
-</section>
+{% for block in page.body %}
+{% include_block block %}
+{% endfor %}
 {% endblock %}

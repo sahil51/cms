@@ -1,26 +1,110 @@
 {% extends "base.html" %}
-{% load wagtailcore_tags %}
+{% load wagtailcore_tags theme_tags %}
+
+{% block title %}Service Areas | {{ page.title }}{% endblock %}
 
 {% block content %}
-<section class="py-32 bg-black text-white" style="background-color: var(--background-color);">
-    <div class="container mx-auto px-6">
-        <h1 class="text-8xl md:text-[10rem] font-black uppercase leading-[0.8] mb-24 border-b-[20px] border-primary pb-12"
-            data-aos="fade-right">Area Map.</h1>
+<section class="sa-hero" data-aos="fade-up">
+    <div class="container">
+        <span class="section-tag"><i class="fa-solid fa-map-location-dot"></i> Service Areas</span>
+        <h1>{{ page.title }}</h1>
+        {% if page.intro %}<p class="sa-intro">{{ page.intro }}</p>{% endif %}
+    </div>
+</section>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-0 border-8 border-white">
+<section class="sa-listing">
+    <div class="container">
+        <div class="sa-grid">
             {% for area in page.get_children.live %}
-            <article class="p-16 border-4 border-white group hover:bg-white hover:text-black transition-all"
-                data-aos="zoom-in">
-                <h2 class="text-4xl md:text-6xl font-black uppercase leading-tight mb-8">
-                    {{ area.specific.location_name|default:area.title }}
-                </h2>
-                <a href="{% pageurl area %}"
-                    class="inline-block bg-primary text-white px-8 py-4 text-xl font-black uppercase tracking-tighter hover:bg-black transition-all">
-                    View Office!
-                </a>
-            </article>
+            {% with area=area.specific %}
+            <a href="{% pageurl area %}" class="sa-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0 }}50">
+                <div class="sa-card-content">
+                    <i class="fa-solid fa-location-dot sa-pin"></i>
+                    <h3>{{ area.location_name|default:area.title }}</h3>
+                    <span class="service-link">View Services <i class="fa-solid fa-arrow-right"></i></span>
+                </div>
+            </a>
+            {% endwith %}
             {% endfor %}
         </div>
     </div>
 </section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .sa-hero {
+        padding: 80px 0 40px;
+    }
+
+    .sa-hero h1 {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 800;
+        margin: 12px 0;
+    }
+
+    .sa-intro {
+        color: var(--text-muted);
+        max-width: 600px;
+        font-size: 1.1rem;
+    }
+
+    .sa-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 24px;
+    }
+
+    .sa-card {
+        background: var(--bg-card);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: var(--radius);
+        padding: 32px;
+        transition: all var(--transition);
+        display: block;
+    }
+
+    .sa-card:hover {
+        border-color: rgba(0, 212, 255, 0.2);
+        transform: translateY(-4px);
+    }
+
+    .sa-pin {
+        color: var(--primary);
+        font-size: 1.3rem;
+        margin-bottom: 12px;
+        display: block;
+    }
+
+    .sa-card h3 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .section-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--primary);
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+
+    .service-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--primary);
+        font-weight: 700;
+        font-size: 0.9rem;
+        transition: all var(--transition);
+    }
+
+    .sa-card:hover .service-link {
+        gap: 12px;
+    }
+</style>
 {% endblock %}

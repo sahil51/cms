@@ -1,0 +1,80 @@
+<section class="process-section" {% if self.section_id %}id="{{ self.section_id }}" {% endif %}
+    data-aos="{{ self.animation|default:'fade-up' }}">
+    <div class="container">
+        <div class="section-header" data-aos="fade-up">
+            <span class="section-tag"><i class="fa-solid fa-list-check"></i> Our Process</span>
+            <h2>{{ self.title }}</h2>
+            {% if self.subtitle %}<p class="section-subtitle">{{ self.subtitle }}</p>{% endif %}
+        </div>
+        <div class="process-grid">
+            {% for step in self.steps %}
+            <div class="process-step" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}50">
+                <div class="step-number">{{ forloop.counter }}</div>
+                <div class="step-icon"><i class="fa-solid {{ step.icon|default:'fa-check-circle' }}"></i></div>
+                <h3>{{ step.title }}</h3>
+                <p>{{ step.description }}</p>
+                {% if not forloop.last %}<div class="step-connector"></div>{% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<style>
+    .process-section {
+        background: var(--bg-card);
+    }
+
+    .process-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 40px;
+        position: relative;
+    }
+
+    .process-step {
+        text-align: center;
+        position: relative;
+        padding: 32px 20px;
+    }
+
+    .step-number {
+        position: absolute;
+        top: 0;
+        right: 20px;
+        font-size: 4rem;
+        font-weight: 900;
+        color: rgba(0, 212, 255, 0.06);
+        line-height: 1;
+    }
+
+    .step-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: rgba(0, 212, 255, 0.1);
+        border: 2px solid rgba(0, 212, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        font-size: 1.4rem;
+        margin: 0 auto 20px;
+    }
+
+    .process-step h3 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .process-step p {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .step-connector {
+        display: none;
+        /* hidden by default, visible on larger screens via flexbox layout */
+    }
+</style>

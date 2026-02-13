@@ -1,25 +1,10 @@
 {% extends "base.html" %}
-{% load wagtailcore_tags %}
+{% load wagtailcore_tags theme_tags %}
+
+{% block title %}{{ page.location_name }} | Service Area{% endblock %}
 
 {% block content %}
-<div class="service-area-page minimal-style">
-    {% for block in page.body %}
-    {% include_block block %}
-    {% endfor %}
-</div>
-
-<section class="py-32 border-t border-black/5" style="background-color: var(--background-color);">
-    <div class="container mx-auto px-6 max-w-4xl text-center">
-        <h2 class="text-3xl font-light tracking-tight mb-12">Proudly Serving {{ page.location_name }}</h2>
-        <div class="w-12 h-[1px] bg-primary mx-auto mb-16 opacity-30"></div>
-        <p class="text-xl font-light opacity-50 mb-16 leading-relaxed max-w-2xl mx-auto">
-            From central hubs to the surrounding outskirts, we bring our professional excellence to every corner of {{
-            page.location_name }}.
-        </p>
-        <a href="{% slugurl 'contact' %}"
-            class="text-[10px] uppercase tracking-[0.4em] font-black border-b border-primary pb-2 hover:opacity-50 transition-opacity">
-            Connect Locally
-        </a>
-    </div>
-</section>
+{% for block in page.body %}
+{% include_block block %}
+{% endfor %}
 {% endblock %}

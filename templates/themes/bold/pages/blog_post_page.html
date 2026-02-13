@@ -1,57 +1,175 @@
 {% extends "base.html" %}
-{% load wagtailcore_tags wagtailimages_tags %}
+{% load wagtailcore_tags wagtailimages_tags theme_tags %}
+
+{% block title %}{{ page.title }} | Blog{% endblock %}
 
 {% block content %}
-<article class="py-32 bg-white text-black" style="background-color: var(--background-color);">
-    <div class="container mx-auto px-6 max-w-5xl">
-        <header class="mb-24" data-aos="fade-down">
-            <div class="flex items-center gap-6 mb-12">
-                <span class="bg-primary text-white px-6 py-2 font-black uppercase text-xl inline-block">{{ page.date
-                    }}</span>
-                <span class="text-4xl font-black uppercase">Article.</span>
+<article class="blog-post">
+    <header class="post-hero" data-aos="fade-up">
+        <div class="container">
+            <div class="post-meta">
+                {% if page.category %}<span class="blog-tag">{{ page.category }}</span>{% endif %}
+                <span class="blog-date"><i class="fa-regular fa-calendar"></i> {{ page.date }}</span>
             </div>
-            <h1
-                class="text-7xl md:text-9xl font-black uppercase leading-[0.85] tracking-tighter mb-12 border-l-[20px] border-black pl-12">
-                {{ page.title }}<span class="text-primary">!</span>
-            </h1>
-            <p class="text-3xl font-bold opacity-80 leading-tight max-w-3xl">{{ page.intro }}</p>
-        </header>
+            <h1>{{ page.title }}</h1>
+            <p class="post-intro">{{ page.intro }}</p>
+        </div>
+    </header>
 
-        <div class="prose prose-bold max-w-none mb-32">
-            {% for block in page.body %}
-            {% if block.block_type == 'paragraph' %}
-            <div class="text-2xl font-bold leading-relaxed mb-16 border-b-4 border-black/5 pb-16">{{ block.value }}
+    {% if page.featured_image %}
+    <div class="post-featured-image" data-aos="fade-up">
+        <div class="container">
+            {% image page.featured_image width-1200 as feat_img %}
+            <img src="{{ feat_img.url }}" alt="{{ page.title }}" loading="lazy">
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="post-body">
+        <div class="container">
+            <div class="post-content">
+                {% for block in page.body %}
+                {% include_block block %}
+                {% endfor %}
             </div>
-            {% elif block.block_type == 'heading' %}
-            <h2
-                class="text-5xl font-black uppercase tracking-tight mt-32 mb-12 bg-black text-white px-8 py-4 inline-block">
-                {{ block.value }}</h2>
-            {% elif block.block_type == 'image' %}
-            <div class="my-24 relative">
-                <div class="absolute inset-0 bg-primary translate-x-6 translate-y-6"></div>
-                <div class="relative border-8 border-black">
-                    {% image block.value width-2000 class="w-full h-auto" %}
+        </div>
+    </div>
+
+    <footer class="post-footer" data-aos="fade-up">
+        <div class="container">
+            <div class="post-share">
+                <span>Share this article:</span>
+                <div class="share-links">
+                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"
+                        target="_blank" class="share-btn"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}" target="_blank"
+                        class="share-btn"><i class="fab fa-twitter"></i></a>
+                    <a href="https://www.linkedin.com/shareArticle?url={{ request.build_absolute_uri }}" target="_blank"
+                        class="share-btn"><i class="fab fa-linkedin-in"></i></a>
                 </div>
             </div>
-            {% else %}
-            <div class="my-24">
-                {% include_block block %}
-            </div>
-            {% endif %}
-            {% endfor %}
         </div>
-
-        <footer class="pt-24 border-t-8 border-black flex flex-col md:flex-row justify-between items-center gap-12">
-            <a href="{{ page.get_parent.url }}"
-                class="bg-black text-white px-12 py-6 text-2xl font-black uppercase tracking-tighter hover:bg-primary transition-all">
-                &lsaquo; Back to Index
-            </a>
-            <div class="flex gap-8 text-4xl">
-                <i class="fab fa-twitter hover:text-primary cursor-pointer"></i>
-                <i class="fab fa-facebook hover:text-primary cursor-pointer"></i>
-                <i class="fab fa-linkedin hover:text-primary cursor-pointer"></i>
-            </div>
-        </footer>
-    </div>
+    </footer>
 </article>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .post-hero {
+        padding: 80px 0 40px;
+    }
+
+    .post-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .blog-tag {
+        background: rgba(0, 212, 255, 0.1);
+        color: var(--primary);
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .blog-date {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+    }
+
+    .post-hero h1 {
+        font-size: clamp(2rem, 4vw, 3.2rem);
+        font-weight: 800;
+        margin-bottom: 16px;
+        max-width: 800px;
+    }
+
+    .post-intro {
+        color: var(--text-muted);
+        font-size: 1.15rem;
+        max-width: 700px;
+    }
+
+    .post-featured-image {
+        padding: 0 0 40px;
+    }
+
+    .post-featured-image img {
+        border-radius: var(--radius);
+        width: 100%;
+        max-height: 500px;
+        object-fit: cover;
+    }
+
+    .post-body {
+        padding-bottom: 60px;
+    }
+
+    .post-content {
+        max-width: 760px;
+        margin: 0 auto;
+    }
+
+    .post-content p {
+        color: var(--text-muted);
+        line-height: 1.9;
+        margin-bottom: 20px;
+        font-size: 1.05rem;
+    }
+
+    .post-content h2,
+    .post-content h3 {
+        margin: 40px 0 16px;
+    }
+
+    .post-content img {
+        border-radius: 8px;
+        margin: 24px 0;
+    }
+
+    .post-footer {
+        padding: 40px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .post-share {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        max-width: 760px;
+        margin: 0 auto;
+    }
+
+    .post-share span {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .share-links {
+        display: flex;
+        gap: 10px;
+    }
+
+    .share-btn {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all var(--transition);
+    }
+
+    .share-btn:hover {
+        background: var(--primary);
+        color: #000;
+        transform: translateY(-2px);
+    }
+</style>
 {% endblock %}

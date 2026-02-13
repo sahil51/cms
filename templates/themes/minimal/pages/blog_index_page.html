@@ -1,35 +1,170 @@
 {% extends "base.html" %}
-{% load wagtailcore_tags wagtailimages_tags %}
+{% load wagtailcore_tags wagtailimages_tags theme_tags %}
+
+{% block title %}Blog | {{ page.title }}{% endblock %}
 
 {% block content %}
-<section class="py-32 bg-white" style="background-color: var(--background-color);">
-    <div class="container mx-auto px-6 max-w-4xl">
-        <h1 class="text-xs uppercase tracking-[0.4em] font-black opacity-30 mb-20 text-center" data-aos="fade-up">
-            Journal</h1>
+<section class="blog-index-hero" data-aos="fade-up">
+    <div class="container">
+        <span class="section-tag"><i class="fa-solid fa-newspaper"></i> Blog</span>
+        <h1>{{ page.title }}</h1>
+        {% if page.intro %}<p class="blog-intro">{{ page.intro }}</p>{% endif %}
+    </div>
+</section>
 
-        <div class="space-y-32">
+<section class="blog-listing">
+    <div class="container">
+        <div class="blog-grid">
             {% for post in blogposts %}
-            <article class="group" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}00">
-                <div class="flex flex-col md:flex-row gap-16 items-baseline border-b border-black/5 pb-24">
-                    <div class="text-[10px] font-black uppercase tracking-[0.2em] opacity-20">0{{ forloop.counter }}
+            {% with post=post.specific %}
+            <article class="blog-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0 }}50">
+                {% if post.featured_image %}
+                {% image post.featured_image fill-640x400 as post_img %}
+                <div class="blog-card-img" style="background-image:url('{{ post_img.url }}');"></div>
+                {% else %}
+                <div class="blog-card-img blog-card-placeholder"><i class="fa-solid fa-shield-halved"></i></div>
+                {% endif %}
+                <div class="blog-card-body">
+                    <div class="blog-meta">
+                        {% if post.category %}<span class="blog-tag">{{ post.category }}</span>{% endif %}
+                        <span class="blog-date"><i class="fa-regular fa-calendar"></i> {{ post.date }}</span>
                     </div>
-                    <div class="flex-1">
-                        <div class="text-[10px] font-black uppercase tracking-widest text-primary mb-4">{{
-                            post.specific.date }}</div>
-                        <h2 class="text-4xl font-light mb-8 group-hover:translate-x-4 transition-transform">
-                            <a href="{% pageurl post %}">{{ post.title }}</a>
-                        </h2>
-                        <p class="text-xl font-light opacity-50 mb-12 max-w-2xl leading-relaxed">{{ post.specific.intro
-                            }}</p>
-                        <a href="{% pageurl post %}"
-                            class="text-xs font-bold uppercase tracking-[0.2em] border-b border-primary pb-1 hover:opacity-50 transition-opacity">
-                            Read Entry
-                        </a>
-                    </div>
+                    <h2><a href="{% pageurl post %}">{{ post.title }}</a></h2>
+                    <p>{{ post.intro }}</p>
+                    <a href="{% pageurl post %}" class="service-link">Read Article <i
+                            class="fa-solid fa-arrow-right"></i></a>
                 </div>
             </article>
+            {% endwith %}
+            {% empty %}
+            <p style="text-align:center;color:var(--text-muted);grid-column:1/-1;">No blog posts yet. Check back soon!
+            </p>
             {% endfor %}
         </div>
     </div>
 </section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .blog-index-hero {
+        padding: 80px 0 40px;
+    }
+
+    .blog-index-hero h1 {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 800;
+        margin: 12px 0;
+    }
+
+    .blog-intro {
+        color: var(--text-muted);
+        max-width: 600px;
+        font-size: 1.1rem;
+    }
+
+    .blog-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+        gap: 32px;
+    }
+
+    .blog-card {
+        background: var(--bg-card);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: var(--radius);
+        overflow: hidden;
+        transition: all var(--transition);
+    }
+
+    .blog-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(0, 212, 255, 0.2);
+    }
+
+    .blog-card-img {
+        height: 220px;
+        background-size: cover;
+        background-position: center;
+    }
+
+    .blog-card-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg);
+        font-size: 3rem;
+        color: rgba(0, 212, 255, 0.15);
+    }
+
+    .blog-card-body {
+        padding: 24px;
+    }
+
+    .blog-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .blog-tag {
+        background: rgba(0, 212, 255, 0.1);
+        color: var(--primary);
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .blog-date {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+    }
+
+    .blog-card h2 {
+        font-size: 1.25rem;
+        margin-bottom: 8px;
+    }
+
+    .blog-card h2 a {
+        transition: color var(--transition);
+    }
+
+    .blog-card h2 a:hover {
+        color: var(--primary);
+    }
+
+    .blog-card p {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 16px;
+    }
+
+    .section-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--primary);
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+
+    .service-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--primary);
+        font-weight: 700;
+        font-size: 0.9rem;
+        transition: all var(--transition);
+    }
+
+    .service-link:hover {
+        gap: 12px;
+    }
+</style>
 {% endblock %}

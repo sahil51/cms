@@ -1,30 +1,75 @@
 {% load wagtailimages_tags %}
-<section class="minimal-success-story-v1 py-32" data-aos="{{ self.animation }}">
-    <div class="container mx-auto px-6 max-w-5xl">
-        <h2 class="text-xs uppercase tracking-[0.4em] font-black opacity-30 mb-20 text-center">{{ self.title }}</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-20">
-            {% for item in self.stories %}
-            <div class="minimal-story-item" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}00">
-                <div class="mb-8 overflow-hidden grayscale aspect-video">
-                    {% if item.image %}
-                    {% image item.image fill-800x450 class="w-full h-full object-cover grayscale hover:grayscale-0
-                    transition-all duration-700" %}
-                    {% else %}
-                    <div class="w-full h-full bg-black/5"></div>
-                    {% endif %}
+<section class="success-stories-section" {% if self.section_id %}id="{{ self.section_id }}" {% endif %}
+    data-aos="{{ self.animation|default:'fade-up' }}">
+    <div class="container">
+        <div class="section-header" data-aos="fade-up">
+            <span class="section-tag"><i class="fa-solid fa-trophy"></i> Success Stories</span>
+            <h2>{{ self.title }}</h2>
+        </div>
+        <div class="stories-grid">
+            {% for story in self.stories %}
+            <div class="story-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}00">
+                {% if story.image %}{% image story.image fill-400x250 as s_img %}<div class="story-img"
+                    style="background-image:url('{{ s_img.url }}');"></div>{% endif %}
+                <div class="story-content">
+                    <span class="story-client">{{ story.client_name }}</span>
+                    <h3>{{ story.story_title }}</h3>
+                    <p>{{ story.summary }}</p>
+                    {% if story.link %}<a href="{{ story.link }}" class="service-link">Read Case Study <i
+                            class="fa-solid fa-arrow-right"></i></a>{% endif %}
                 </div>
-                <span class="text-[10px] uppercase tracking-widest font-black opacity-30 mb-2 block">{{ item.client_name
-                    }}</span>
-                <h3 class="text-3xl font-light mb-6 leading-tight">{{ item.story_title }}</h3>
-                <p class="text-lg font-light opacity-50 mb-8 max-w-md">{{ item.summary }}</p>
-                {% if item.link %}
-                <a href="{{ item.link }}"
-                    class="text-xs font-bold uppercase tracking-widest border-b border-primary pb-1 hover:opacity-50 transition-opacity">
-                    View Case
-                </a>
-                {% endif %}
             </div>
             {% endfor %}
         </div>
     </div>
 </section>
+<style>
+    .stories-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 32px;
+    }
+
+    .story-card {
+        background: var(--bg-card);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: var(--radius);
+        overflow: hidden;
+        transition: all var(--transition);
+    }
+
+    .story-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(0, 212, 255, 0.2);
+    }
+
+    .story-img {
+        height: 200px;
+        background-size: cover;
+        background-position: center;
+    }
+
+    .story-content {
+        padding: 24px;
+    }
+
+    .story-client {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--primary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .story-content h3 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin: 8px 0;
+    }
+
+    .story-content p {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 12px;
+    }
+</style>

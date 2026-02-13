@@ -1,0 +1,329 @@
+{% extends "wagtailadmin/base.html" %}
+{% load i18n wagtailadmin_tags %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    :root {
+        --customizer-sidebar-width: 380px;
+        --sidebar-bg: #111111;
+        --sidebar-text: #e0e0e0;
+        --accent: #2ecc71;
+        --accent-hover: #27ae60;
+        --border: rgba(255, 255, 255, 0.08);
+        --input-bg: #222222;
+    }
+
+    /* Full layout management */
+    body,
+    html {
+        margin: 0;
+        padding: 0 !important;
+        height: 100vh;
+        overflow: hidden;
+        background: #000;
+    }
+
+    .customizer-wrapper {
+        display: flex;
+        height: 100vh;
+        width: 100vw;
+        position: fixed;
+        top: 0;
+        left: 0;
+    }
+
+    /* Sidebar Design */
+    .customizer-sidebar {
+        width: var(--customizer-sidebar-width);
+        min-width: var(--customizer-sidebar-width);
+        background: var(--sidebar-bg);
+        color: var(--sidebar-text);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        z-index: 100;
+        box-shadow: 15px 0 40px rgba(0, 0, 0, 0.5);
+        position: relative;
+    }
+
+    .customizer-sidebar-scrollable {
+        flex-grow: 1;
+        overflow-y: auto;
+        position: relative;
+    }
+
+    .customizer-header {
+        padding: 24px;
+        background: #000;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .header-left h1 {
+        margin: 0;
+        font-size: 1.4rem;
+        color: #fff;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+
+    .header-left p {
+        margin: 6px 0 0;
+        font-size: 0.8rem;
+        color: #666;
+        line-height: 1.2;
+    }
+
+    .btn-back {
+        background: #222;
+        color: #888;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        text-decoration: none;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border: 1px solid #333;
+        transition: all 0.3s;
+    }
+
+    .btn-back:hover {
+        background: #333;
+        color: #fff;
+        border-color: #444;
+    }
+
+    .customizer-form-body {
+        padding: 24px;
+    }
+
+    .form-section {
+        margin-bottom: 32px;
+    }
+
+    .form-section h3 {
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: #444;
+        margin-bottom: 20px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 8px;
+        font-weight: 700;
+    }
+
+    /* Form elements styling */
+    .customizer-sidebar label {
+        display: block !important;
+        margin-bottom: 8px !important;
+        font-weight: 600 !important;
+        font-size: 0.85rem !important;
+        color: #fff !important;
+        opacity: 0.9 !important;
+    }
+
+    .customizer-sidebar p {
+        margin-bottom: 20px !important;
+    }
+
+    .customizer-sidebar input[type="text"],
+    .customizer-sidebar select {
+        width: 100%;
+        padding: 10px 12px;
+        background: var(--input-bg);
+        border: 1px solid #333;
+        border-radius: 6px;
+        color: #fff;
+        font-size: 0.85rem;
+        transition: all 0.2s ease;
+    }
+
+    .customizer-sidebar input[type="text"]:focus,
+    .customizer-sidebar select:focus {
+        border-color: var(--accent);
+        background: #2a2a2a;
+        outline: none;
+    }
+
+    .customizer-sidebar input[type="color"] {
+        -webkit-appearance: none;
+        width: 100%;
+        height: 38px;
+        border: 1px solid #333;
+        border-radius: 6px;
+        background: var(--input-bg);
+        cursor: pointer;
+        padding: 3px;
+    }
+
+    .customizer-sidebar input[type="color"]::-webkit-color-swatch-wrapper {
+        padding: 0;
+    }
+
+    .customizer-sidebar input[type="color"]::-webkit-color-swatch {
+        border: none;
+        border-radius: 4px;
+    }
+
+    /* Fixed footer - NO OVERLAP */
+    .customizer-footer {
+        padding: 20px 24px;
+        background: #000;
+        border-top: 1px solid var(--border);
+        display: flex;
+        gap: 10px;
+        z-index: 101;
+        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .btn-save {
+        flex: 2;
+        background: var(--accent);
+        color: #000;
+        border: none;
+        padding: 12px;
+        border-radius: 6px;
+        font-weight: 800;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .btn-save:hover {
+        background: var(--accent-hover);
+        transform: translateY(-1px);
+    }
+
+    .btn-visit {
+        flex: 1;
+        background: #222;
+        color: #fff;
+        text-align: center;
+        text-decoration: none;
+        padding: 12px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        border: 1px solid #333;
+        transition: all 0.3s;
+    }
+
+    .btn-visit:hover {
+        background: #333;
+    }
+
+    /* Preview container */
+    .customizer-preview {
+        flex-grow: 1;
+        background: #000;
+        position: relative;
+        z-index: 1;
+    }
+
+    .preview-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        background: #fff;
+    }
+
+    .preview-loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #fff;
+        font-weight: 600;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s;
+        z-index: 2;
+        background: rgba(0, 0, 0, 0.6);
+        padding: 15px 25px;
+        border-radius: 10px;
+        backdrop-filter: blur(5px);
+    }
+
+    iframe.loading {
+        opacity: 0.4;
+    }
+
+    iframe.loading+.preview-loading {
+        opacity: 1;
+    }
+
+    /* Wagtail Conflict Fixes */
+    #wagtail-sidebar,
+    .sidebar,
+    .wagtail-sidebar {
+        display: none !important;
+    }
+
+    #main,
+    main,
+    .content-wrapper,
+    .wrapper {
+        margin-left: 0 !important;
+        padding: 0 !important;
+    }
+</style>
+{% endblock %}
+
+{% block titletag %}Visual Customizer{% endblock %}
+
+{% block content %}
+<div class="customizer-wrapper">
+    <aside class="customizer-sidebar">
+        <header class="customizer-header">
+            <div class="header-left">
+                <h1>Visual Customizer</h1>
+                <p>Live Theme Engine</p>
+            </div>
+            <a href="{% url 'wagtailadmin_home' %}" class="btn-back">Dashboard</a>
+        </header>
+
+        <div class="customizer-sidebar-scrollable">
+            <div class="customizer-form-body">
+                <form id="customizer-form" action="{% url 'theme_customizer' %}" method="POST">
+                    {% csrf_token %}
+
+                    <div class="form-section">
+                        <h3>Design & Identity</h3>
+                        {{ form.as_p }}
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <footer class="customizer-footer">
+            <button type="submit" form="customizer-form" class="btn-save">Save changes</button>
+            <a href="/" target="_blank" class="btn-visit">View Site</a>
+        </footer>
+    </aside>
+
+    <main class="customizer-preview">
+        <iframe id="preview" src="/" class="preview-iframe"></iframe>
+        <div class="preview-loading">Reloading preview...</div>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+    const form = document.getElementById('customizer-form');
+    const iframe = document.getElementById('preview');
+
+    form.addEventListener('submit', function () {
+        iframe.classList.add('loading');
+    });
+
+    iframe.addEventListener('load', function () {
+        iframe.classList.remove('loading');
+    });
+</script>
+{% endblock %}

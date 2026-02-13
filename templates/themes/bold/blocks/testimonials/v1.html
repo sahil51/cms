@@ -1,25 +1,129 @@
-<section class="bold-testimonials-v1 py-32 overflow-hidden">
-    <div class="container mx-auto px-6">
-        <h2 class="text-8xl font-black uppercase mb-24 opacity-10">{{ self.title }}</h2>
-        <div class="space-y-32">
-            {% for item in self.testimonials %}
-            <div class="flex flex-col {% if forloop.counter|divisibleby:2 %}lg:flex-row-reverse{% else %}lg:flex-row{% endif %} items-center gap-16"
-                data-aos="fade-up">
-                <div class="lg:w-1/3">
-                    {% if item.image %}
-                    {% image item.image fill-400x400-c100 class="border-16 border-primary rotate-3 transition-transform
-                    hover:rotate-0 shadow-2xl" %}
-                    {% endif %}
-                </div>
-                <div class="lg:w-2/3">
-                    <div class="text-9xl font-black text-primary opacity-20 h-20">"</div>
-                    <p class="text-4xl font-black uppercase leading-tight mb-8">{{ item.quote }}</p>
-                    <div class="text-xl font-bold border-l-8 border-primary pl-6">
-                        {{ item.author }} <span class="opacity-30">/ {{ item.role }}</span>
+{% load wagtailimages_tags %}
+<section class="testimonials-section" {% if self.section_id %}id="{{ self.section_id }}" {% endif %}
+    data-aos="{{ self.animation|default:'fade-up' }}">
+    <div class="container">
+        <div class="section-header" data-aos="fade-up">
+            <span class="section-tag"><i class="fa-solid fa-quote-left"></i> Testimonials</span>
+            <h2>{{ self.title }}</h2>
+        </div>
+        <div class="swiper testimonials-swiper">
+            <div class="swiper-wrapper">
+                {% for t in self.testimonials %}
+                <div class="swiper-slide">
+                    <div class="testimonial-card">
+                        <div class="stars">
+                            {% for i in "12345" %}
+                            {% if forloop.counter <= t.rating|default:5 %} <i class="fa-solid fa-star"></i>
+                                {% else %}
+                                <i class="fa-regular fa-star"></i>
+                                {% endif %}
+                                {% endfor %}
+                        </div>
+                        <blockquote>"{{ t.quote }}"</blockquote>
+                        <div class="testimonial-author">
+                            {% if t.image %}
+                            {% image t.image fill-56x56 as avatar %}
+                            <img src="{{ avatar.url }}" alt="{{ t.author }}" class="author-avatar">
+                            {% else %}
+                            <div class="author-avatar-placeholder"><i class="fa-solid fa-user"></i></div>
+                            {% endif %}
+                            <div>
+                                <strong>{{ t.author }}</strong>
+                                {% if t.role %}<span>{{ t.role }}</span>{% endif %}
+                                {% if t.location %}<span class="t-location"><i class="fa-solid fa-location-dot"></i> {{
+                                    t.location }}</span>{% endif %}
+                            </div>
+                        </div>
                     </div>
                 </div>
+                {% endfor %}
             </div>
-            {% endfor %}
+            <div class="swiper-pagination"></div>
         </div>
     </div>
 </section>
+
+<style>
+    .testimonials-section {
+        background: var(--bg-card);
+    }
+
+    .testimonials-swiper {
+        padding-bottom: 48px;
+    }
+
+    .testimonial-card {
+        background: var(--bg);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: var(--radius);
+        padding: 40px;
+        max-width: 660px;
+        margin: 0 auto;
+    }
+
+    .stars {
+        color: #FFB800;
+        font-size: 1rem;
+        margin-bottom: 20px;
+        display: flex;
+        gap: 4px;
+    }
+
+    .testimonial-card blockquote {
+        font-size: 1.15rem;
+        line-height: 1.8;
+        color: var(--text-muted);
+        margin: 0 0 24px;
+        font-style: italic;
+    }
+
+    .testimonial-author {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .author-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .author-avatar-placeholder {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: rgba(0, 212, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+    }
+
+    .testimonial-author strong {
+        display: block;
+        font-size: 0.95rem;
+    }
+
+    .testimonial-author span {
+        display: block;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+
+    .t-location {
+        display: inline-flex !important;
+        align-items: center;
+        gap: 4px;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        new Swiper('.testimonials-swiper', {
+            loop: true, autoplay: { delay: 6000, disableOnInteraction: false },
+            pagination: { el: '.testimonials-swiper .swiper-pagination', clickable: true },
+        });
+    });
+</script>

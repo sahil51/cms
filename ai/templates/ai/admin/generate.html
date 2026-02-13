@@ -1,91 +1,375 @@
-{% extends "wagtailadmin/base.html" %}{% load i18n wagtailadmin_tags %}
-{% block titletag %}{% trans "AI Theme Generator" %}{% endblock %}
+{% extends "wagtailadmin/base.html" %}
+{% load i18n wagtailadmin_tags %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    :root {
+        --customizer-sidebar-width: 380px;
+        --sidebar-bg: #111111;
+        --sidebar-text: #e0e0e0;
+        --accent: #2ecc71;
+        --accent-hover: #27ae60;
+        --border: rgba(255, 255, 255, 0.08);
+        --input-bg: #222222;
+    }
+
+    /* Full layout management */
+    body,
+    html {
+        margin: 0;
+        padding: 0 !important;
+        height: 100vh;
+        overflow: hidden;
+        background: #000;
+    }
+
+    .customizer-wrapper {
+        display: flex;
+        height: 100vh;
+        width: 100vw;
+        position: fixed;
+        top: 0;
+        left: 0;
+    }
+
+    /* Sidebar Design */
+    .customizer-sidebar {
+        width: var(--customizer-sidebar-width);
+        min-width: var(--customizer-sidebar-width);
+        background: var(--sidebar-bg);
+        color: var(--sidebar-text);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        z-index: 100;
+        box-shadow: 15px 0 40px rgba(0, 0, 0, 0.5);
+        position: relative;
+    }
+
+    .customizer-sidebar-scrollable {
+        flex-grow: 1;
+        overflow-y: auto;
+        position: relative;
+        padding: 24px;
+    }
+
+    .customizer-header {
+        padding: 24px;
+        background: #000;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .header-left h1 {
+        margin: 0;
+        font-size: 1.4rem;
+        color: #fff;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+
+    .header-left p {
+        margin: 6px 0 0;
+        font-size: 0.8rem;
+        color: #666;
+        line-height: 1.2;
+    }
+
+    .btn-back {
+        background: #222;
+        color: #888;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        text-decoration: none;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border: 1px solid #333;
+        transition: all 0.3s;
+    }
+
+    .btn-back:hover {
+        background: #333;
+        color: #fff;
+        border-color: #444;
+    }
+
+    .form-section {
+        margin-bottom: 32px;
+    }
+
+    .form-section h3 {
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: #444;
+        margin-bottom: 20px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 8px;
+        font-weight: 700;
+    }
+
+    /* Form elements styling */
+    label {
+        display: block !important;
+        margin-bottom: 8px !important;
+        font-weight: 600 !important;
+        font-size: 0.85rem !important;
+        color: #fff !important;
+        opacity: 0.9 !important;
+    }
+
+    textarea,
+    select {
+        width: 100%;
+        padding: 12px 14px;
+        background: var(--input-bg);
+        border: 1px solid #333;
+        border-radius: 8px;
+        color: #fff;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        margin-bottom: 15px;
+    }
+
+    textarea:focus,
+    select:focus {
+        border-color: var(--accent);
+        background: #2a2a2a;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.1);
+    }
+
+    /* Fixed footer - NO OVERLAP */
+    .customizer-footer {
+        padding: 16px 24px;
+        background: #000;
+        border-top: 1px solid var(--border);
+        display: flex;
+        gap: 12px;
+        z-index: 101;
+        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .btn-generate {
+        flex: 1;
+        background: var(--accent);
+        color: #000;
+        border: none;
+        height: 46px;
+        border-radius: 6px;
+        font-weight: 800;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .btn-generate:hover {
+        background: var(--accent-hover);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2);
+    }
+
+    /* Hide scrollbar for textarea but keep functionality */
+    #prompt {
+        scrollbar-width: none;
+        /* Firefox */
+        -ms-overflow-style: none;
+        /* IE and Edge */
+    }
+
+    #prompt::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Preview container */
+    .customizer-preview {
+        flex-grow: 1;
+        background: #000;
+        position: relative;
+        z-index: 1;
+    }
+
+    .preview-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        background: #fff;
+        transition: opacity 0.5s;
+    }
+
+    .preview-loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #fff;
+        font-weight: 600;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s;
+        z-index: 2;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 30px 50px;
+        border-radius: 16px;
+        backdrop-filter: blur(10px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    iframe.loading {
+        opacity: 0.2;
+    }
+
+    .form-loading .preview-loading {
+        opacity: 1;
+    }
+
+    /* Wagtail Conflict Fixes */
+    #wagtail-sidebar,
+    .sidebar,
+    .wagtail-sidebar {
+        display: none !important;
+    }
+
+    #main,
+    main,
+    .content-wrapper,
+    .wrapper {
+        margin-left: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* AI Specific */
+    .ai-status {
+        font-size: 0.9rem;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: 800;
+    }
+
+    .ai-subtext {
+        color: #888;
+        font-size: 0.85rem;
+    }
+</style>
+{% endblock %}
+
+{% block titletag %}AI Theme Generator{% endblock %}
 
 {% block content %}
-<header class="merged">
-    <div class="row">
-        <div class="left">
-            <div class="col">
-                <h1 class="icon icon-magic">{% trans "AI Theme Generator" %}</h1>
+<div class="customizer-wrapper">
+    <aside class="customizer-sidebar">
+        <header class="customizer-header">
+            <div class="header-left">
+                <h1>AI Generator</h1>
+                <p>Powered by Gemini 2.0</p>
             </div>
-        </div>
-    </div>
-</header>
+            <a href="{% url 'wagtailadmin_home' %}" class="btn-back">Dashboard</a>
+        </header>
 
-<div class="nice-padding">
-    <div class="help-block" style="margin-bottom: 2rem;">
-        <p>
-            Enter a description for your website's theme or a specific section.
-            Our AI will automatically adjust colors, typography, and layouts to match your vision.
-        </p>
-    </div>
+        <div class="customizer-sidebar-scrollable">
+            <form id="ai-generate-form" action="" method="POST">
+                {% csrf_token %}
 
-    <form action="" method="POST" id="ai-generate-form">
-        {% csrf_token %}
+                <div class="form-section">
+                    <h3>Target Selection</h3>
+                    <div class="field">
+                        <label for="page_id">Target Page</label>
+                        <select name="page_id" id="page_id">
+                            <option value="global">Global Theme (All Pages)</option>
+                            {% for page in pages %}
+                            <option value="{{ page.id }}" {% if selected_page_id==page.id %}selected{% endif %}
+                                data-url="{{ page.url }}">{{ page.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-        <div class="field-row" style="display: flex; gap: 2rem; margin-bottom: 2rem;">
-            <!-- Page Selection -->
-            <div class="field" style="flex: 1;">
-                <label for="page_id">Target Page</label>
-                <div class="field-content">
-                    <select name="page_id" id="page_id" style="width: 100%;">
-                        <option value="global">Global Theme (All Pages)</option>
-                        {% for page in pages %}
-                        <option value="{{ page.id }}">{{ page.title }}</option>
-                        {% endfor %}
-                    </select>
+                    <div class="field" id="section-field" style="display: none;">
+                        <label for="block_id">Target Section</label>
+                        <select name="block_id" id="block_id">
+                            <option value="">Select a section...</option>
+                        </select>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Section Selection (Dynamic) -->
-            <div class="field" id="section-field" style="flex: 1; display: none;">
-                <label for="block_id">Target Section</label>
-                <div class="field-content">
-                    <select name="block_id" id="block_id" style="width: 100%;">
-                        <option value="">Select a section...</option>
-                    </select>
+                <div class="form-section">
+                    <h3>Design Prompt</h3>
+                    <div class="field">
+                        <label for="prompt">Describe your vision</label>
+                        <textarea name="prompt" id="prompt" rows="6"
+                            placeholder="e.g. Cyberpunk theme with neon green accents, dark mode, and glitch effects for the hero section...">{{ last_prompt|default:'' }}</textarea>
+                    </div>
                 </div>
-            </div>
-        </div>
-
-        <div class="field">
-            <label for="prompt">Design Prompt</label>
-            <div class="field-content">
-                <div class="input">
-                    <textarea name="prompt" id="prompt" rows="6"
-                        placeholder="e.g. Make the hero section more vibrant with a dark glassmorphism card..."
-                        style="width: 100%; border-radius: 4px; border: 1px solid var(--w-color-grey-150); padding: 10px;"></textarea>
-                </div>
-            </div>
+            </form>
         </div>
 
-        <div style="margin-top: 2rem;">
-            <button type="submit" class="button button-longrunning">
-                {% icon name="magic" %}
-                <span class="label" id="submit-label">{% trans "Update Global Theme" %}</span>
+        <footer class="customizer-footer">
+            <button type="submit" form="ai-generate-form" class="btn-generate">
+                <span id="submit-label">GENERATE THEME</span>
             </button>
-        </div>
-    </form>
-</div>
+        </footer>
+    </aside>
 
+    <main class="customizer-preview">
+        <iframe id="preview" src="{{ preview_url|default:'/' }}" class="preview-iframe"></iframe>
+        <div class="preview-loading">
+            <div class="ai-status">AI Processing</div>
+            <div class="ai-subtext">Designing your theme...</div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('ai-generate-form');
+        const iframe = document.getElementById('preview');
         const pageSelect = document.getElementById('page_id');
         const sectionField = document.getElementById('section-field');
         const sectionSelect = document.getElementById('block_id');
         const submitLabel = document.getElementById('submit-label');
+        const wrapper = document.querySelector('.customizer-wrapper');
 
+        // Handle Page Selection Change
         pageSelect.addEventListener('change', function () {
             const pageId = this.value;
 
             if (pageId === 'global') {
                 sectionField.style.display = 'none';
-                submitLabel.textContent = '{% trans "Update Global Theme" %}';
+                submitLabel.textContent = 'Generate Global Theme';
                 sectionSelect.required = false;
+                iframe.src = '/';
             } else {
                 sectionField.style.display = 'block';
-                submitLabel.textContent = '{% trans "Update Specific Section" %}';
+                submitLabel.textContent = 'Generate Section Theme';
                 sectionSelect.required = true;
+
+                // Update preview URL instantly
+                const selectedOption = this.options[this.selectedIndex];
+                const pageUrl = selectedOption.getAttribute('data-url');
+                if (pageUrl) {
+                    iframe.src = pageUrl;
+                }
 
                 // Fetch sections for this page
                 fetch(`/admin/ai-generate/api/sections/${pageId}/`)
@@ -100,6 +384,17 @@
                         });
                     });
             }
+        });
+
+        // Loading State
+        form.addEventListener('submit', function () {
+            wrapper.classList.add('form-loading');
+            iframe.classList.add('loading');
+        });
+
+        iframe.addEventListener('load', function () {
+            wrapper.classList.remove('form-loading');
+            iframe.classList.remove('loading');
         });
     });
 </script>

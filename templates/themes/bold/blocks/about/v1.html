@@ -1,19 +1,59 @@
-<section class="bold-about-v1 py-24 relative overflow-hidden" style="background-color: var(--background-color);">
-    <div class="container mx-auto px-6">
-        <div class="flex flex-col lg:flex-row gap-0">
-            <div class="lg:w-1/2 bg-black p-16 text-white" data-aos="fade-right">
-                <h2 class="text-7xl font-black uppercase mb-12 transform -rotate-1 origin-left">{{ self.title }}</h2>
-                <div class="prose prose-invert prose-2xl font-bold opacity-90">
-                    {{ self.content }}
-                </div>
+{% load wagtailimages_tags %}
+<section class="about-section" {% if self.section_id %}id="{{ self.section_id }}" {% endif %}
+    data-aos="{{ self.animation|default:'fade-up' }}">
+    <div class="container">
+        <div class="about-grid">
+            {% if self.image %}
+            <div class="about-image" data-aos="fade-right">
+                {% image self.image fill-600x500 as abt_img %}
+                <img src="{{ abt_img.url }}" alt="{{ self.title }}" loading="lazy">
             </div>
-            <div class="lg:w-1/2 relative min-h-[500px]" data-aos="fade-left">
-                {% if self.image %}
-                {% image self.image original class="absolute inset-0 w-full h-full object-cover grayscale" %}
-                {% endif %}
-                <div class="absolute inset-0 bg-primary/20 mix-blend-multiply"></div>
-                <div class="absolute bottom-10 right-10 border-20 border-white/10 w-40 h-40"></div>
+            {% endif %}
+            <div class="about-content" data-aos="fade-left">
+                <span class="section-tag"><i class="fa-solid fa-building"></i> About Us</span>
+                <h2>{{ self.title }}</h2>
+                <div class="about-text">{{ self.content }}</div>
             </div>
         </div>
     </div>
 </section>
+
+<style>
+    .about-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 64px;
+        align-items: center;
+    }
+
+    .about-image img {
+        border-radius: var(--radius);
+        width: 100%;
+        object-fit: cover;
+    }
+
+    .about-content .section-tag {
+        margin-bottom: 12px;
+    }
+
+    .about-content h2 {
+        font-size: clamp(1.8rem, 3vw, 2.5rem);
+        font-weight: 800;
+        margin-bottom: 24px;
+    }
+
+    .about-text {
+        color: var(--text-muted);
+        line-height: 1.8;
+    }
+
+    .about-text p {
+        margin-bottom: 16px;
+    }
+
+    @media (max-width: 768px) {
+        .about-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

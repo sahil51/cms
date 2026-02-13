@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags %}
+
+{% block content %}
+<div style="padding-top: 60px; background: #000;">
+    {% for block in page.body %}
+    {% include_block block %}
+    {% endfor %}
+</div>
+{% endblock %}

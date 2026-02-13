@@ -1,17 +1,102 @@
-<section class="minimal-faq-v1 py-20 border-t border-black/5">
-    <div class="container mx-auto max-w-2xl px-6">
-        <h2 class="text-xs uppercase tracking-[0.4em] font-black opacity-20 mb-12 text-center">{{ self.title }}</h2>
-        <div class="space-y-10">
+<section class="faq-section" {% if self.section_id %}id="{{ self.section_id }}" {% endif %}
+    data-aos="{{ self.animation|default:'fade-up' }}">
+    <div class="container">
+        <div class="section-header" data-aos="fade-up">
+            <span class="section-tag"><i class="fa-solid fa-circle-question"></i> FAQ</span>
+            <h2>{{ self.title }}</h2>
+        </div>
+        <div class="faq-list">
             {% for item in self.items %}
-            <div class="group" data-aos="fade-up">
-                <h3
-                    class="text-xl font-light mb-4 border-l-2 border-transparent group-hover:border-primary pl-6 transition-all">
-                    {{ item.question }}</h3>
-                <div class="prose prose-sm opacity-50 font-light pl-6">
-                    {{ item.answer }}
-                </div>
+            <div class="faq-item" data-aos="fade-up" data-aos-delay="{{ forloop.counter0 }}50">
+                <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                    <span>{{ item.question }}</span>
+                    <i class="fa-solid fa-chevron-down faq-arrow"></i>
+                </button>
+                <div class="faq-answer">{{ item.answer }}</div>
             </div>
             {% endfor %}
         </div>
     </div>
+
+    {% if self.enable_schema %}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {% for item in self.items %}
+            {
+                "@type": "Question",
+                "name": "{{ item.question|escapejs }}",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "{{ item.answer|striptags|escapejs }}"
+                }
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ]
+    }
+    </script>
+    {% endif %}
 </section>
+
+<style>
+    .faq-list {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .faq-item {
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: var(--radius);
+        margin-bottom: 12px;
+        overflow: hidden;
+        background: var(--bg-card);
+        transition: all var(--transition);
+    }
+
+    .faq-item:hover {
+        border-color: rgba(0, 212, 255, 0.15);
+    }
+
+    .faq-question {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        padding: 20px 24px;
+        background: none;
+        border: none;
+        color: var(--text);
+        font-size: 1rem;
+        font-weight: 600;
+        text-align: left;
+        cursor: pointer;
+        font-family: var(--heading-font);
+    }
+
+    .faq-arrow {
+        transition: transform 0.3s ease;
+        color: var(--primary);
+        font-size: 0.85rem;
+    }
+
+    .faq-item.open .faq-arrow {
+        transform: rotate(180deg);
+    }
+
+    .faq-answer {
+        max-height: 0;
+        overflow: hidden;
+        padding: 0 24px;
+        color: var(--text-muted);
+        line-height: 1.8;
+        font-size: 0.95rem;
+        transition: max-height 0.4s ease, padding 0.3s ease;
+    }
+
+    .faq-item.open .faq-answer {
+        max-height: 500px;
+        padding: 0 24px 24px;
+    }
+</style>

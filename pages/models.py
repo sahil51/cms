@@ -16,11 +16,17 @@ from wagtail.documents.blocks import DocumentChooserBlock
 from .blocks import (
     HeroBlock, AboutBlock, ServicesBlock, FAQBlock, 
     TestimonialsBlock, CTABlock, GalleryBlock, DocumentBlock,
-    LeadMagnetBlock, SuccessStoryBlock, PartnerBlock
+    LeadMagnetBlock, SuccessStoryBlock, PartnerBlock,
+    CarouselHeroBlock, WhyChooseUsBlock, IndustriesBlock,
+    ProcessStepsBlock, TrustBarBlock, LeadFormBlock, FinalCTABlock
 )
 
-@register_snippet
-class ThemeConfig(models.Model):
+# ==============================================
+# THEME CONFIGURATION
+# ==============================================
+
+@register_setting
+class ThemeSettings(BaseSiteSetting):
     THEME_CHOICES = [
         ('modern', 'Modern'),
         ('minimal', 'Minimal'),
@@ -35,40 +41,135 @@ class ThemeConfig(models.Model):
     services_variant = models.CharField(max_length=10, default='v1')
     faq_variant = models.CharField(max_length=10, default='v1')
     
-    primary_color = models.CharField(max_length=7, default='#6C63FF')
-    secondary_color = models.CharField(max_length=7, default='#FF6584')
-    background_color = models.CharField(max_length=7, default='#0F172A')
+    primary_color = models.CharField(max_length=7, default='#00D4FF')
+    secondary_color = models.CharField(max_length=7, default='#FF6B35')
+    background_color = models.CharField(max_length=7, default='#0A0E17')
     text_color = models.CharField(max_length=7, default='#FFFFFF')
     
-    heading_font = models.CharField(max_length=100, default='Poppins')
+    heading_font = models.CharField(max_length=100, default='Inter')
     body_font = models.CharField(max_length=100, default='Inter')
     
     animation_preset = models.CharField(max_length=50, default='smooth-fade')
     
-    # AI state for auditing/history
     last_ai_prompt = models.TextField(blank=True, null=True)
     
     class Meta:
         verbose_name = "Theme Configuration"
-        verbose_name_plural = "Theme Configuration"
 
     def __str__(self):
-        return f"Theme Config ({self.base_theme})"
+        return f"Theme Settings for {self.site}"
+
+# ==============================================
+# SITE SETTINGS (Global Header/Footer/SEO)
+# ==============================================
+
+@register_setting
+class SiteSettings(BaseSiteSetting):
+    logo = models.ForeignKey(
+        'wagtailimages.Image',
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+'
+    )
+    site_name = models.CharField(max_length=100, blank=True, default="SecureGuard Pro")
+    phone_number = models.CharField(max_length=20, blank=True)
+    email_address = models.EmailField(blank=True)
+    
+    # Header CTA
+    header_cta_text = models.CharField(max_length=50, blank=True, default="Get Free Quote")
+    header_cta_link = models.URLField(blank=True, default="/contact/")
+    
+    # Announcement Bar
+    announcement_text = models.CharField(
+        max_length=200, blank=True,
+        help_text="Top announcement bar text. Leave empty to hide.")
+    announcement_link = models.URLField(blank=True)
+    
+    # Emergency Badge
+    emergency_badge_text = models.CharField(
+        max_length=50, blank=True, default="24/7 Emergency",
+        help_text="Emergency badge in header. Leave empty to hide.")
+    emergency_phone = models.CharField(max_length=20, blank=True)
+    
+    # Address
+    address = models.TextField(blank=True)
+    
+    # Social Media
+    facebook_url = models.URLField(blank=True)
+    twitter_url = models.URLField(blank=True)
+    instagram_url = models.URLField(blank=True)
+    linkedin_url = models.URLField(blank=True)
+    youtube_url = models.URLField(blank=True)
+
+    # SEO Defaults
+    default_og_image = models.ForeignKey(
+        'wagtailimages.Image',
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+        help_text="Default Open Graph image when pages don't have one"
+    )
+
+    panels = [
+        MultiFieldPanel([
+            FieldPanel('logo'),
+            FieldPanel('site_name'),
+            FieldPanel('phone_number'),
+            FieldPanel('email_address'),
+            FieldPanel('address'),
+        ], heading="Business Information"),
+        MultiFieldPanel([
+            FieldPanel('header_cta_text'),
+            FieldPanel('header_cta_link'),
+        ], heading="Header CTA Button"),
+        MultiFieldPanel([
+            FieldPanel('announcement_text'),
+            FieldPanel('announcement_link'),
+        ], heading="Announcement Bar"),
+        MultiFieldPanel([
+            FieldPanel('emergency_badge_text'),
+            FieldPanel('emergency_phone'),
+        ], heading="Emergency Badge"),
+        MultiFieldPanel([
+            FieldPanel('facebook_url'),
+            FieldPanel('twitter_url'),
+            FieldPanel('instagram_url'),
+            FieldPanel('linkedin_url'),
+            FieldPanel('youtube_url'),
+        ], heading="Social Media Links"),
+        MultiFieldPanel([
+            FieldPanel('default_og_image'),
+        ], heading="SEO Defaults"),
+    ]
+
+# ==============================================
+# CONTENT PAGE (Main StreamField Page)
+# ==============================================
+
+ALL_BLOCKS = [
+    ('hero', HeroBlock()),
+    ('carousel_hero', CarouselHeroBlock()),
+    ('about', AboutBlock()),
+    ('services', ServicesBlock()),
+    ('why_choose_us', WhyChooseUsBlock()),
+    ('industries', IndustriesBlock()),
+    ('process_steps', ProcessStepsBlock()),
+    ('trust_bar', TrustBarBlock()),
+    ('testimonials', TestimonialsBlock()),
+    ('success_story', SuccessStoryBlock()),
+    ('partners', PartnerBlock()),
+    ('faq', FAQBlock()),
+    ('cta', CTABlock()),
+    ('final_cta', FinalCTABlock()),
+    ('lead_form', LeadFormBlock()),
+    ('lead_magnet', LeadMagnetBlock()),
+    ('gallery', GalleryBlock()),
+    ('document', DocumentBlock()),
+]
 
 class ContentPage(Page):
-    body = StreamField([
-        ('hero', HeroBlock()),
-        ('about', AboutBlock()),
-        ('services', ServicesBlock()),
-        ('faq', FAQBlock()),
-        ('testimonials', TestimonialsBlock()),
-        ('cta', CTABlock()),
-        ('gallery', GalleryBlock()),
-        ('document', DocumentBlock()),
-        ('lead_magnet', LeadMagnetBlock()),
-        ('success_story', SuccessStoryBlock()),
-        ('partners', PartnerBlock()),
-    ], use_json_field=True)
+    page_description = "Standard page with modular sections (StreamField) for custom layouts."
+    body = StreamField(ALL_BLOCKS, use_json_field=True)
 
     content_panels = Page.content_panels + [
         FieldPanel('body'),
@@ -79,46 +180,69 @@ class ContentPage(Page):
     ]
 
     class Meta:
-        verbose_name = "Content Page"
+        verbose_name = "01. Content Page"
 
-@register_setting
-class SiteSettings(BaseSiteSetting):
-    logo = models.ForeignKey(
+    def get_template(self, request, *args, **kwargs):
+        site = getattr(request, 'site', None)
+        if not site:
+            from wagtail.models import Site
+            site = Site.objects.get(is_default_site=True)
+        config = ThemeSettings.for_site(site)
+        theme = config.base_theme if config else 'modern'
+        return f"themes/{theme}/pages/content_page.html"
+
+# ==============================================
+# SERVICE DETAIL PAGE
+# ==============================================
+
+class ServicePage(Page):
+    page_description = "Detailed page for a specific security service (e.g., CCTV, Alarms)."
+    icon = models.CharField(max_length=50, blank=True, help_text="FontAwesome class e.g. fa-shield-halved")
+    featured_image = models.ForeignKey(
         'wagtailimages.Image',
-        null=True,
-        blank=True,
+        null=True, blank=True,
         on_delete=models.SET_NULL,
         related_name='+'
     )
-    phone_number = models.CharField(max_length=20, blank=True)
-    email_address = models.EmailField(blank=True)
+    intro = models.TextField(blank=True)
     
-    # Social Media
-    facebook_url = models.URLField(blank=True, help_text="Facebook page URL")
-    twitter_url = models.URLField(blank=True, help_text="Twitter profile URL")
-    instagram_url = models.URLField(blank=True, help_text="Instagram profile URL")
-    linkedin_url = models.URLField(blank=True, help_text="LinkedIn profile URL")
+    body = StreamField(ALL_BLOCKS, use_json_field=True)
 
-    panels = [
+    content_panels = Page.content_panels + [
         MultiFieldPanel([
-            FieldPanel('logo'),
-            FieldPanel('phone_number'),
-            FieldPanel('email_address'),
-        ], heading="Business Information"),
-        MultiFieldPanel([
-            FieldPanel('facebook_url'),
-            FieldPanel('twitter_url'),
-            FieldPanel('instagram_url'),
-            FieldPanel('linkedin_url'),
-        ], heading="Social Media Links"),
+            FieldPanel('icon'),
+            FieldPanel('featured_image'),
+            FieldPanel('intro'),
+        ], heading="Service Header"),
+        FieldPanel('body'),
     ]
 
-# --- Form Builder ---
+    search_fields = Page.search_fields + [
+        index.SearchField('intro'),
+        index.SearchField('body'),
+    ]
+
+    def get_template(self, request, *args, **kwargs):
+        site = getattr(request, 'site', None)
+        if not site:
+            from wagtail.models import Site
+            site = Site.objects.get(is_default_site=True)
+        config = ThemeSettings.for_site(site)
+        theme = config.base_theme if config else 'modern'
+        return f"themes/{theme}/pages/service_page.html"
+
+    class Meta:
+        verbose_name = "02. Service Page"
+
+# ==============================================
+# CONTACT PAGE
+# ==============================================
 
 class FormField(AbstractFormField):
     page = ParentalKey('ContactPage', on_delete=models.CASCADE, related_name='form_fields')
 
 class ContactPage(AbstractEmailForm):
+    page_description = "Page with a contact form, address, and emergency contact details."
     intro = StreamField([
         ('hero', HeroBlock()),
     ], use_json_field=True, blank=True)
@@ -127,6 +251,7 @@ class ContactPage(AbstractEmailForm):
     address = models.TextField(blank=True, help_text="Physical address for the map section")
     phone_cta = models.CharField(max_length=20, blank=True, help_text="Phone number for 'Call Now' CTA")
     map_embed_url = models.URLField(blank=True, help_text="Google Maps Embed URL")
+    emergency_text = models.CharField(max_length=200, blank=True, default="Need Emergency Security? Call Now!")
 
     content_panels = AbstractEmailForm.content_panels + [
         FieldPanel('intro'),
@@ -136,7 +261,8 @@ class ContactPage(AbstractEmailForm):
             FieldPanel('address'),
             FieldPanel('phone_cta'),
             FieldPanel('map_embed_url'),
-        ], heading="Blueprint Contact Info"),
+            FieldPanel('emergency_text'),
+        ], heading="Contact Information"),
         MultiFieldPanel([
             FieldPanel('from_address'),
             FieldPanel('to_address'),
@@ -149,9 +275,11 @@ class ContactPage(AbstractEmailForm):
     ]
 
     class Meta:
-        verbose_name = "Contact Page"
+        verbose_name = "03. Contact Page"
 
-# --- Blog System ---
+# ==============================================
+# BLOG SYSTEM
+# ==============================================
 
 class BlogIndexPage(Page):
     intro = models.TextField(blank=True)
@@ -160,8 +288,18 @@ class BlogIndexPage(Page):
         FieldPanel('intro'),
     ]
 
+    class Meta:
+        verbose_name = "04. Articles Index"
+
+    subpage_types = ['BlogPostPage']
+    page_description = "Listing page that automatically gathers and displays article posts."
+
     def get_template(self, request, *args, **kwargs):
-        config = ThemeConfig.objects.first()
+        site = getattr(request, 'site', None)
+        if not site:
+            from wagtail.models import Site
+            site = Site.objects.get(is_default_site=True)
+        config = ThemeSettings.for_site(site)
         theme = config.base_theme if config else 'modern'
         return f"themes/{theme}/pages/blog_index_page.html"
 
@@ -174,6 +312,14 @@ class BlogIndexPage(Page):
 class BlogPostPage(Page):
     date = models.DateField("Post date")
     intro = models.CharField(max_length=250)
+    featured_image = models.ForeignKey(
+        'wagtailimages.Image',
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+'
+    )
+    category = models.CharField(max_length=100, blank=True, help_text="e.g. CCTV, Access Control, Tips")
+    
     body = StreamField([
         ('heading', blocks.CharBlock(form_classname="title")),
         ('paragraph', blocks.RichTextBlock()),
@@ -188,17 +334,33 @@ class BlogPostPage(Page):
     ]
 
     content_panels = Page.content_panels + [
-        FieldPanel('date'),
+        MultiFieldPanel([
+            FieldPanel('date'),
+            FieldPanel('category'),
+            FieldPanel('featured_image'),
+        ], heading="Post Meta"),
         FieldPanel('intro'),
         FieldPanel('body'),
     ]
 
+    class Meta:
+        verbose_name = "↳ Article Post"
+
+    parent_page_types = ['BlogIndexPage']
+    page_description = "Individual news article or informative security post."
+
     def get_template(self, request, *args, **kwargs):
-        config = ThemeConfig.objects.first()
+        site = getattr(request, 'site', None)
+        if not site:
+            from wagtail.models import Site
+            site = Site.objects.get(is_default_site=True)
+        config = ThemeSettings.for_site(site)
         theme = config.base_theme if config else 'modern'
         return f"themes/{theme}/pages/blog_post_page.html"
 
-# --- Service Area System ---
+# ==============================================
+# SERVICE AREA SYSTEM
+# ==============================================
 
 class ServiceAreaIndexPage(Page):
     intro = models.TextField(blank=True)
@@ -207,31 +369,48 @@ class ServiceAreaIndexPage(Page):
         FieldPanel('intro'),
     ]
 
+    class Meta:
+        verbose_name = "05. Area Index Page"
+
+    subpage_types = ['ServiceAreaPage']
+    page_description = "Index page to list all geographical regions where services are provided."
+
     def get_template(self, request, *args, **kwargs):
-        config = ThemeConfig.objects.first()
+        site = getattr(request, 'site', None)
+        if not site:
+            from wagtail.models import Site
+            site = Site.objects.get(is_default_site=True)
+        config = ThemeSettings.for_site(site)
         theme = config.base_theme if config else 'modern'
         return f"themes/{theme}/pages/service_area_index_page.html"
 
 class ServiceAreaPage(Page):
     location_name = models.CharField(max_length=100)
-    body = StreamField([
-        ('hero', HeroBlock()),
-        ('services', ServicesBlock()),
-        ('success_stories', SuccessStoryBlock()),
-        ('cta', CTABlock()),
-    ], use_json_field=True)
+    body = StreamField(ALL_BLOCKS, use_json_field=True)
 
     content_panels = Page.content_panels + [
         FieldPanel('location_name'),
         FieldPanel('body'),
     ]
 
+    class Meta:
+        verbose_name = "↳ Area Detail Page"
+
+    parent_page_types = ['ServiceAreaIndexPage']
+    page_description = "Detailed page for a specific location or service region."
+
     def get_template(self, request, *args, **kwargs):
-        config = ThemeConfig.objects.first()
+        site = getattr(request, 'site', None)
+        if not site:
+            from wagtail.models import Site
+            site = Site.objects.get(is_default_site=True)
+        config = ThemeSettings.for_site(site)
         theme = config.base_theme if config else 'modern'
         return f"themes/{theme}/pages/service_area_page.html"
 
-# --- Dynamic Menus ---
+# ==============================================
+# DYNAMIC MENUS
+# ==============================================
 
 @register_snippet
 class Menu(ClusterableModel):
@@ -253,8 +432,7 @@ class MenuItem(Orderable):
     link_url = models.CharField(max_length=500, blank=True)
     link_page = models.ForeignKey(
         'wagtailcore.Page',
-        null=True,
-        blank=True,
+        null=True, blank=True,
         related_name='+',
         on_delete=models.CASCADE,
     )

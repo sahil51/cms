@@ -1,24 +1,10 @@
 {% extends "base.html" %}
-{% load wagtailcore_tags %}
+{% load wagtailcore_tags theme_tags %}
+
+{% block title %}{{ page.location_name }} | Service Area{% endblock %}
 
 {% block content %}
-<div class="service-area-page">
-    {% for block in page.body %}
-    {% include_block block %}
-    {% endfor %}
-</div>
-
-<section class="py-24 bg-slate-900/30">
-    <div class="container mx-auto px-6 text-center">
-        <h2 class="text-4xl font-black uppercase mb-8">Serving the {{ page.location_name }} Community</h2>
-        <p class="text-xl font-bold opacity-50 mb-12 max-w-2xl mx-auto">
-            We are proud to offer our full suite of professional services to residents and businesses throughout {{
-            page.location_name }}.
-        </p>
-        <a href="{% slugurl 'contact' %}"
-            class="btn btn-primary inline-flex items-center gap-4 py-5 px-12 text-xl font-black uppercase">
-            Book Local Consultation <i class="fa fa-map-marker"></i>
-        </a>
-    </div>
-</section>
+{% for block in page.body %}
+{% include_block block %}
+{% endfor %}
 {% endblock %}

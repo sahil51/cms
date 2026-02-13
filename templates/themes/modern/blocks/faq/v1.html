@@ -1,22 +1,102 @@
-<section class="faq-v1 py-20 bg-slate-900/30">
-    <div class="container mx-auto max-w-3xl px-6">
-        <h2 class="text-4xl font-bold mb-12 text-center" data-aos="fade-up">{{ self.title }}</h2>
-        <div class="space-y-4">
+<section class="faq-section" {% if self.section_id %}id="{{ self.section_id }}" {% endif %}
+    data-aos="{{ self.animation|default:'fade-up' }}">
+    <div class="container">
+        <div class="section-header" data-aos="fade-up">
+            <span class="section-tag"><i class="fa-solid fa-circle-question"></i> FAQ</span>
+            <h2>{{ self.title }}</h2>
+        </div>
+        <div class="faq-list">
             {% for item in self.items %}
-            <details
-                class="group bg-white/5 border border-white/10 rounded-2xl p-6 transition-all duration-300 open:bg-white/10"
-                data-aos="fade-up" data-aos-delay="{{ forloop.counter0 }}00">
-                <summary class="flex items-center justify-between cursor-pointer font-bold text-lg list-none">
-                    {{ item.question }}
-                    <span class="text-primary transition-transform group-open:rotate-180">
-                        <i class="fa fa-chevron-down"></i>
-                    </span>
-                </summary>
-                <div class="mt-4 opacity-70 prose prose-invert">
-                    {{ item.answer }}
-                </div>
-            </details>
+            <div class="faq-item" data-aos="fade-up" data-aos-delay="{{ forloop.counter0 }}50">
+                <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                    <span>{{ item.question }}</span>
+                    <i class="fa-solid fa-chevron-down faq-arrow"></i>
+                </button>
+                <div class="faq-answer">{{ item.answer }}</div>
+            </div>
             {% endfor %}
         </div>
     </div>
+
+    {% if self.enable_schema %}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {% for item in self.items %}
+            {
+                "@type": "Question",
+                "name": "{{ item.question|escapejs }}",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "{{ item.answer|striptags|escapejs }}"
+                }
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ]
+    }
+    </script>
+    {% endif %}
 </section>
+
+<style>
+    .faq-list {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .faq-item {
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: var(--radius);
+        margin-bottom: 12px;
+        overflow: hidden;
+        background: var(--bg-card);
+        transition: all var(--transition);
+    }
+
+    .faq-item:hover {
+        border-color: rgba(0, 212, 255, 0.15);
+    }
+
+    .faq-question {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        padding: 20px 24px;
+        background: none;
+        border: none;
+        color: var(--text);
+        font-size: 1rem;
+        font-weight: 600;
+        text-align: left;
+        cursor: pointer;
+        font-family: var(--heading-font);
+    }
+
+    .faq-arrow {
+        transition: transform 0.3s ease;
+        color: var(--primary);
+        font-size: 0.85rem;
+    }
+
+    .faq-item.open .faq-arrow {
+        transform: rotate(180deg);
+    }
+
+    .faq-answer {
+        max-height: 0;
+        overflow: hidden;
+        padding: 0 24px;
+        color: var(--text-muted);
+        line-height: 1.8;
+        font-size: 0.95rem;
+        transition: max-height 0.4s ease, padding 0.3s ease;
+    }
+
+    .faq-item.open .faq-answer {
+        max-height: 500px;
+        padding: 0 24px 24px;
+    }
+</style>

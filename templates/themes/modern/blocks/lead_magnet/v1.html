@@ -1,78 +1,80 @@
 {% load wagtailimages_tags %}
-<section class="lead-magnet-v1" data-aos="{{ self.animation }}">
+<section class="lead-magnet-section" {% if self.section_id %}id="{{ self.section_id }}" {% endif %}
+    data-aos="{{ self.animation|default:'fade-up' }}">
     <div class="container">
-        <div class="magnet-card">
-            <div class="magnet-text">
-                <h2>{{ self.title }}</h2>
-                {% if self.subtitle %}
-                <p>{{ self.subtitle }}</p>
-                {% endif %}
-                <div class="mt-8">
-                    <a href="{{ self.form_action|default:'#' }}" class="btn btn-primary magnet-btn">
-                        {{ self.offer_text }} <i class="fa fa-download ml-2 text-sm opacity-50"></i>
-                    </a>
-                </div>
-            </div>
+        <div class="lead-magnet-card">
             {% if self.image %}
-            <div class="magnet-image">
-                {% image self.image width-600 class="rounded-2xl" %}
-            </div>
+            <div class="lm-image">{% image self.image fill-400x400 as lm_img %}<img src="{{ lm_img.url }}"
+                    alt="{{ self.title }}" loading="lazy"></div>
             {% endif %}
+            <div class="lm-content">
+                <h2>{{ self.title }}</h2>
+                {% if self.subtitle %}<p>{{ self.subtitle }}</p>{% endif %}
+                <form action="{{ self.form_action|default:'#' }}" method="post" class="lm-form">
+                    {% csrf_token %}
+                    <input type="email" placeholder="Enter your email" required>
+                    <button type="submit" class="btn btn-primary">{{ self.offer_text }} <i
+                            class="fa-solid fa-download"></i></button>
+                </form>
+            </div>
         </div>
     </div>
 </section>
-
 <style>
-    .lead-magnet-v1 {
-        padding: 60px 0;
-    }
-
-    .magnet-card {
-        background: linear-gradient(135deg, rgba(108, 99, 255, 0.2), rgba(255, 101, 132, 0.2));
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 5rem;
-        border-radius: 40px;
+    .lead-magnet-card {
         display: flex;
         align-items: center;
-        gap: 5rem;
-        -webkit-backdrop-filter: blur(20px);
-        backdrop-filter: blur(20px);
+        gap: 48px;
+        background: var(--bg-card);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: var(--radius);
+        padding: 48px;
     }
 
-    .magnet-text {
-        flex: 1;
+    .lm-image img {
+        width: 200px;
+        border-radius: 12px;
     }
 
-    .magnet-text h2 {
-        font-size: 3rem;
-        font-weight: 900;
-        margin-bottom: 1.5rem;
-        line-height: 1.1;
+    .lm-content h2 {
+        font-size: 1.6rem;
+        font-weight: 800;
+        margin-bottom: 8px;
     }
 
-    .magnet-text p {
-        font-size: 1.25rem;
-        opacity: 0.7;
-        line-height: 1.6;
+    .lm-content p {
+        color: var(--text-muted);
+        margin-bottom: 24px;
     }
 
-    .magnet-image {
-        flex: 1;
+    .lm-form {
         display: flex;
-        justify-content: center;
+        gap: 12px;
     }
 
-    .magnet-btn {
-        font-size: 1.125rem;
-        padding: 1.25rem 3rem;
-        border-radius: 100px;
+    .lm-form input {
+        flex: 1;
+        padding: 12px 16px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        color: var(--text);
+        font-size: 0.95rem;
     }
 
-    @media (max-width: 992px) {
-        .magnet-card {
+    .lm-form input:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    @media (max-width:768px) {
+        .lead-magnet-card {
             flex-direction: column;
-            padding: 3rem;
             text-align: center;
+        }
+
+        .lm-form {
+            flex-direction: column;
         }
     }
 </style>
