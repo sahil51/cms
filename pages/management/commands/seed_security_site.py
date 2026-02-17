@@ -22,8 +22,9 @@ class Command(BaseCommand):
         # ============================================
         # 1. THEME CONFIG
         # ============================================
-        config, _ = ThemeConfig.objects.update_or_create(
-            pk=1,
+        site = Site.objects.filter(is_default_site=True).first()
+        config, _ = ThemeSettings.objects.update_or_create(
+            site=site,
             defaults={
                 'base_theme': 'modern',
                 'primary_color': '#00D4FF',
@@ -628,6 +629,27 @@ class Command(BaseCommand):
             settings.emergency_badge_text = "24/7 Emergency"
             settings.emergency_phone = "1-800-911-SAFE"
             settings.address = "123 Security Boulevard, Suite 400\nMetro City, MC 10001"
+            
+            # New dynamic labels
+            settings.gallery_tag = "Featured Projects"
+            settings.process_tag = "Our Security Process"
+            settings.industries_tag = "Sectors We Protect"
+            settings.partners_tag = "Trusted Partners"
+            settings.success_stories_tag = "Client Success Stories"
+            settings.submit_button_label = "Request Free Quote"
+            settings.no_results_message = "No articles found in this category. Please check back soon!"
+            settings.form_success_message = "Great! Your security request has been sent. A specialist will call you shortly."
+            settings.emergency_contact_label = "24/7 Security Hotline"
+            settings.contact_form_title = "Tailored Security Consultation"
+            
+            # Icons
+            settings.announcement_icon = "fa-bell"
+            settings.emergency_icon = "fa-shield-halved"
+            settings.phone_icon = "fa-phone"
+            settings.email_icon = "fa-envelope"
+            settings.location_icon = "fa-location-dot"
+            settings.menu_icon = "fa-bars"
+            
             settings.save()
             self.stdout.write(self.style.SUCCESS('  ✓ Site settings configured'))
 

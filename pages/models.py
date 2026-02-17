@@ -28,12 +28,13 @@ from .blocks import (
 @register_setting
 class ThemeSettings(BaseSiteSetting):
     THEME_CHOICES = [
-        ('modern', 'Modern'),
-        ('minimal', 'Minimal'),
-        ('bold', 'Bold'),
+        ('corporate', 'Corporate'),
+        ('creative', 'Creative'),
+        ('saas', 'SaaS'),
+        ('editorial', 'Editorial'),
     ]
     
-    base_theme = models.CharField(max_length=20, choices=THEME_CHOICES, default='modern')
+    base_theme = models.CharField(max_length=20, choices=THEME_CHOICES, default='corporate')
     
     # Block Variants
     hero_variant = models.CharField(max_length=10, default='v1')
@@ -51,10 +52,55 @@ class ThemeSettings(BaseSiteSetting):
     
     animation_preset = models.CharField(max_length=50, default='smooth-fade')
     
+    logo = models.ForeignKey(
+        'wagtailimages.Image',
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+        verbose_name="Site Logo"
+    )
+    site_name = models.CharField(max_length=100, blank=True, default="SecureGuard Pro")
+    
+    hero_bg_image = models.ForeignKey(
+        'wagtailimages.Image',
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+        verbose_name="Hero Background Image"
+    )
+    hero_video_url = models.URLField(
+        blank=True, 
+        null=True, 
+        help_text="Direct link to MP4 or YouTube/Vimeo URL",
+        verbose_name="Hero Background Video"
+    )
+    
     last_ai_prompt = models.TextField(blank=True, null=True)
     
-    class Meta:
-        verbose_name = "Theme Configuration"
+    panels = [
+        MultiFieldPanel([
+            FieldPanel('logo'),
+            FieldPanel('site_name'),
+        ], heading="Branding"),
+        MultiFieldPanel([
+            FieldPanel('base_theme'),
+            FieldPanel('animation_preset'),
+        ], heading="Theme Layout"),
+        MultiFieldPanel([
+            FieldPanel('hero_bg_image'),
+            FieldPanel('hero_video_url'),
+        ], heading="Hero Media"),
+        MultiFieldPanel([
+            FieldPanel('primary_color'),
+            FieldPanel('secondary_color'),
+            FieldPanel('background_color'),
+            FieldPanel('text_color'),
+        ], heading="Colors"),
+        MultiFieldPanel([
+            FieldPanel('heading_font'),
+            FieldPanel('body_font'),
+        ], heading="Typography"),
+    ]
 
     def __str__(self):
         return f"Theme Settings for {self.site}"
@@ -71,7 +117,39 @@ class SiteSettings(BaseSiteSetting):
         on_delete=models.SET_NULL,
         related_name='+'
     )
+    # Logo & Branding
     site_name = models.CharField(max_length=100, blank=True, default="SecureGuard Pro")
+    logo_split_index = models.PositiveIntegerField(
+        default=6, 
+        help_text="Number of characters to style with the primary color (e.g. 6 for 'Secure' in 'SecureGuard')"
+    )
+    
+    # Global Section Tags
+    services_tag = models.CharField(max_length=50, blank=True, default="Our Services")
+    blog_tag = models.CharField(max_length=50, blank=True, default="Latest News")
+    areas_tag = models.CharField(max_length=50, blank=True, default="Service Areas")
+    testimonials_tag = models.CharField(max_length=50, blank=True, default="Testimonials")
+    faq_tag = models.CharField(max_length=50, blank=True, default="FAQ")
+    gallery_tag = models.CharField(max_length=50, blank=True, default="Project Gallery")
+    process_tag = models.CharField(max_length=50, blank=True, default="Our Process")
+    industries_tag = models.CharField(max_length=50, blank=True, default="Industries We Serve")
+    partners_tag = models.CharField(max_length=50, blank=True, default="Our Partners")
+    success_stories_tag = models.CharField(max_length=50, blank=True, default="Success Stories")
+    
+    # Global Link & Action Labels
+    read_more_label = models.CharField(max_length=50, blank=True, default="Read Article")
+    view_services_label = models.CharField(max_length=50, blank=True, default="View Services")
+    share_label = models.CharField(max_length=50, blank=True, default="Share this article:")
+    submit_button_label = models.CharField(max_length=50, blank=True, default="Submit Now")
+    no_results_message = models.CharField(max_length=255, blank=True, default="No items found. Please check back later.")
+    form_success_message = models.CharField(max_length=255, blank=True, default="Thank you! Your message has been sent successfully.")
+    
+    # Global Contact Labels
+    emergency_contact_label = models.CharField(max_length=50, blank=True, default="Emergency Contact")
+    contact_form_title = models.CharField(max_length=100, blank=True, default="Send Us a Message")
+    call_us_label = models.CharField(max_length=50, blank=True, default="Call Us")
+    visit_us_label = models.CharField(max_length=50, blank=True, default="Visit Us")
+
     phone_number = models.CharField(max_length=20, blank=True)
     email_address = models.EmailField(blank=True)
     
@@ -84,6 +162,7 @@ class SiteSettings(BaseSiteSetting):
         max_length=200, blank=True,
         help_text="Top announcement bar text. Leave empty to hide.")
     announcement_link = models.URLField(blank=True)
+    announcement_link_text = models.CharField(max_length=50, blank=True, default="Learn More")
     
     # Emergency Badge
     emergency_badge_text = models.CharField(
@@ -94,8 +173,41 @@ class SiteSettings(BaseSiteSetting):
     # Address
     address = models.TextField(blank=True)
     
+    # Footer Content
+    footer_description = models.TextField(
+        blank=True, 
+        default="Professional security solutions for homes and businesses. CCTV, alarm systems, access control, and 24/7 monitoring services you can trust.",
+        help_text="Description shown in the footer"
+    )
+    footer_copyright_text = models.CharField(
+        max_length=255, 
+        blank=True, 
+        default="All rights reserved. | Professional Security Solutions",
+        help_text="Copyright suffix text"
+    )
+    
+    # Footer Labels
+    footer_services_label = models.CharField(max_length=50, default="Services", blank=True)
+    footer_company_label = models.CharField(max_length=50, default="Company", blank=True)
+    footer_contact_label = models.CharField(max_length=50, default="Contact Info", blank=True)
+
     # Social Media
     facebook_url = models.URLField(blank=True)
+    # Branding & Icons
+    favicon = models.ForeignKey(
+        'wagtailimages.Image',
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+        help_text="Site favicon (PNG or ICO)"
+    )
+    announcement_icon = models.CharField(max_length=50, blank=True, default="fa-bell")
+    emergency_icon = models.CharField(max_length=50, blank=True, default="fa-shield-halved")
+    phone_icon = models.CharField(max_length=50, blank=True, default="fa-phone")
+    email_icon = models.CharField(max_length=50, blank=True, default="fa-envelope")
+    location_icon = models.CharField(max_length=50, blank=True, default="fa-location-dot")
+    menu_icon = models.CharField(max_length=50, blank=True, default="fa-bars")
+
     twitter_url = models.URLField(blank=True)
     instagram_url = models.URLField(blank=True)
     linkedin_url = models.URLField(blank=True)
@@ -112,12 +224,48 @@ class SiteSettings(BaseSiteSetting):
 
     panels = [
         MultiFieldPanel([
+            FieldPanel('favicon'),
+            FieldPanel('announcement_icon'),
+            FieldPanel('emergency_icon'),
+            FieldPanel('phone_icon'),
+            FieldPanel('email_icon'),
+            FieldPanel('location_icon'),
+            FieldPanel('menu_icon'),
+        ], heading="Global Icons & Favicon"),
+        MultiFieldPanel([
             FieldPanel('logo'),
             FieldPanel('site_name'),
+            FieldPanel('logo_split_index'),
             FieldPanel('phone_number'),
             FieldPanel('email_address'),
             FieldPanel('address'),
         ], heading="Business Information"),
+        MultiFieldPanel([
+            FieldPanel('services_tag'),
+            FieldPanel('blog_tag'),
+            FieldPanel('areas_tag'),
+            FieldPanel('testimonials_tag'),
+            FieldPanel('faq_tag'),
+            FieldPanel('gallery_tag'),
+            FieldPanel('process_tag'),
+            FieldPanel('industries_tag'),
+            FieldPanel('partners_tag'),
+            FieldPanel('success_stories_tag'),
+        ], heading="Global Section Tags"),
+        MultiFieldPanel([
+            FieldPanel('read_more_label'),
+            FieldPanel('view_services_label'),
+            FieldPanel('share_label'),
+            FieldPanel('submit_button_label'),
+            FieldPanel('no_results_message'),
+            FieldPanel('form_success_message'),
+        ], heading="Global Link & Action Labels"),
+        MultiFieldPanel([
+            FieldPanel('emergency_contact_label'),
+            FieldPanel('contact_form_title'),
+            FieldPanel('call_us_label'),
+            FieldPanel('visit_us_label'),
+        ], heading="Contact Labels"),
         MultiFieldPanel([
             FieldPanel('header_cta_text'),
             FieldPanel('header_cta_link'),
@@ -125,11 +273,19 @@ class SiteSettings(BaseSiteSetting):
         MultiFieldPanel([
             FieldPanel('announcement_text'),
             FieldPanel('announcement_link'),
+            FieldPanel('announcement_link_text'),
         ], heading="Announcement Bar"),
         MultiFieldPanel([
             FieldPanel('emergency_badge_text'),
             FieldPanel('emergency_phone'),
         ], heading="Emergency Badge"),
+        MultiFieldPanel([
+            FieldPanel('footer_description'),
+            FieldPanel('footer_copyright_text'),
+            FieldPanel('footer_services_label'),
+            FieldPanel('footer_company_label'),
+            FieldPanel('footer_contact_label'),
+        ], heading="Footer Content"),
         MultiFieldPanel([
             FieldPanel('facebook_url'),
             FieldPanel('twitter_url'),
@@ -305,7 +461,8 @@ class BlogIndexPage(Page):
 
     def get_context(self, request):
         context = super().get_context(request)
-        blogposts = self.get_children().live().order_by('-first_published_at')
+        # Optimization: Fetch specific BlogPostPage objects to avoid N+1 queries
+        blogposts = BlogPostPage.objects.child_of(self).live().order_by('-first_published_at')
         context['blogposts'] = blogposts
         return context
 
@@ -364,6 +521,13 @@ class BlogPostPage(Page):
 
 class ServiceAreaIndexPage(Page):
     intro = models.TextField(blank=True)
+
+    def get_context(self, request):
+        context = super().get_context(request)
+        # Optimization: Fetch specific ServiceAreaPage objects
+        areas = ServiceAreaPage.objects.child_of(self).live().order_by('title')
+        context['areas'] = areas
+        return context
 
     content_panels = Page.content_panels + [
         FieldPanel('intro'),

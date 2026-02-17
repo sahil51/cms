@@ -1,0 +1,32 @@
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold">{{ self.title }}</h2>
+        <p class="text-white-50">{{ self.subtitle }}</p>
+    </div>
+    <div class="row g-4">
+        {% for item in self.services %}
+        <div class="col-lg-4">
+            <div class="card-saas h-100 text-center border-white-5 hover-border-primary transition-all">
+                {% if item.icon %}
+                <div class="mb-4 text-primary fs-1">
+                    <i class="fas {{ item.icon }}"></i>
+                </div>
+                {% endif %}
+                <h3 class="h4 mb-3">{{ item.name }}</h3>
+                <p class="text-white-50">{{ item.description }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .border-white-5 {
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .hover-border-primary:hover {
+        border-color: var(--primary);
+        transform: translateY(-5px);
+    }
+</style>

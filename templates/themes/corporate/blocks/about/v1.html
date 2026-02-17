@@ -1,0 +1,30 @@
+<div class="py-5">
+    <div class="container py-5">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                {% if self.section_tag %}
+                <span class="section-tag">{{ self.section_tag }}</span>
+                {% endif %}
+                <h2 class="display-5 mb-4">{{ self.title }}</h2>
+                <div class="content opacity-80 mb-5">
+                    {{ self.content|richtext }}
+                </div>
+            </div>
+            <div class="col-lg-6">
+                {% if self.image %}
+                <div class="position-relative">
+                    {% load wagtailimages_tags %}
+                    {% image self.image original class="img-fluid rounded-4 shadow-2xl" %}
+                    <div class="position-absolute bottom-0 start-0 p-4 w-100"
+                        style="background: linear-gradient(0deg, rgba(0,0,0,0.5), transparent);">
+                        <div class="bg-white p-3 rounded-3 d-inline-block shadow">
+                            <span class="fw-bold d-block">Trusted & Professional</span>
+                            <small class="text-muted">Corporate Excellence</small>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

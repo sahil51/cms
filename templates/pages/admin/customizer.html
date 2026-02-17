@@ -1,329 +1,1065 @@
 {% extends "wagtailadmin/base.html" %}
-{% load i18n wagtailadmin_tags %}
+{% load static wagtailimages_tags %}
+
+{% block titletag %}Visual Customizer{% endblock %}
+{% block bodyclass %}visual-customizer-page{% endblock %}
 
 {% block extra_css %}
 {{ block.super }}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
     :root {
-        --customizer-sidebar-width: 380px;
-        --sidebar-bg: #111111;
-        --sidebar-text: #e0e0e0;
-        --accent: #2ecc71;
-        --accent-hover: #27ae60;
-        --border: rgba(255, 255, 255, 0.08);
-        --input-bg: #222222;
+        --vc-bg: #0f1117;
+        --vc-sidebar: #161822;
+        --vc-card: #1e2030;
+        --vc-border: #2a2d3e;
+        --vc-text: #e4e6f0;
+        --vc-text-muted: #8b8fa3;
+        --vc-accent: #6366f1;
+        --vc-accent-hover: #818cf8;
+        --vc-success: #22c55e;
+        --vc-danger: #ef4444;
+        --vc-warning: #f59e0b;
+        --vc-radius: 10px;
     }
 
-    /* Full layout management */
-    body,
-    html {
-        margin: 0;
+    /* Hide Wagtail's default layout elements */
+    .visual-customizer-page .content-wrapper,
+    .visual-customizer-page .content {
         padding: 0 !important;
-        height: 100vh;
-        overflow: hidden;
-        background: #000;
+        margin: 0 !important;
+        max-width: 100% !important;
     }
 
-    .customizer-wrapper {
-        display: flex;
-        height: 100vh;
-        width: 100vw;
-        position: fixed;
-        top: 0;
-        left: 0;
-    }
-
-    /* Sidebar Design */
-    .customizer-sidebar {
-        width: var(--customizer-sidebar-width);
-        min-width: var(--customizer-sidebar-width);
-        background: var(--sidebar-bg);
-        color: var(--sidebar-text);
-        border-right: 1px solid var(--border);
-        display: flex;
-        flex-direction: column;
-        z-index: 100;
-        box-shadow: 15px 0 40px rgba(0, 0, 0, 0.5);
-        position: relative;
-    }
-
-    .customizer-sidebar-scrollable {
-        flex-grow: 1;
-        overflow-y: auto;
-        position: relative;
-    }
-
-    .customizer-header {
-        padding: 24px;
-        background: #000;
-        border-bottom: 1px solid var(--border);
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-    }
-
-    .header-left h1 {
-        margin: 0;
-        font-size: 1.4rem;
-        color: #fff;
-        font-weight: 800;
-        letter-spacing: -0.5px;
-    }
-
-    .header-left p {
-        margin: 6px 0 0;
-        font-size: 0.8rem;
-        color: #666;
-        line-height: 1.2;
-    }
-
-    .btn-back {
-        background: #222;
-        color: #888;
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-size: 0.75rem;
-        text-decoration: none;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        border: 1px solid #333;
-        transition: all 0.3s;
-    }
-
-    .btn-back:hover {
-        background: #333;
-        color: #fff;
-        border-color: #444;
-    }
-
-    .customizer-form-body {
-        padding: 24px;
-    }
-
-    .form-section {
-        margin-bottom: 32px;
-    }
-
-    .form-section h3 {
-        font-size: 0.65rem;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        color: #444;
-        margin-bottom: 20px;
-        border-bottom: 1px solid var(--border);
-        padding-bottom: 8px;
-        font-weight: 700;
-    }
-
-    /* Form elements styling */
-    .customizer-sidebar label {
-        display: block !important;
-        margin-bottom: 8px !important;
-        font-weight: 600 !important;
-        font-size: 0.85rem !important;
-        color: #fff !important;
-        opacity: 0.9 !important;
-    }
-
-    .customizer-sidebar p {
-        margin-bottom: 20px !important;
-    }
-
-    .customizer-sidebar input[type="text"],
-    .customizer-sidebar select {
-        width: 100%;
-        padding: 10px 12px;
-        background: var(--input-bg);
-        border: 1px solid #333;
-        border-radius: 6px;
-        color: #fff;
-        font-size: 0.85rem;
-        transition: all 0.2s ease;
-    }
-
-    .customizer-sidebar input[type="text"]:focus,
-    .customizer-sidebar select:focus {
-        border-color: var(--accent);
-        background: #2a2a2a;
-        outline: none;
-    }
-
-    .customizer-sidebar input[type="color"] {
-        -webkit-appearance: none;
-        width: 100%;
-        height: 38px;
-        border: 1px solid #333;
-        border-radius: 6px;
-        background: var(--input-bg);
-        cursor: pointer;
-        padding: 3px;
-    }
-
-    .customizer-sidebar input[type="color"]::-webkit-color-swatch-wrapper {
-        padding: 0;
-    }
-
-    .customizer-sidebar input[type="color"]::-webkit-color-swatch {
-        border: none;
-        border-radius: 4px;
-    }
-
-    /* Fixed footer - NO OVERLAP */
-    .customizer-footer {
-        padding: 20px 24px;
-        background: #000;
-        border-top: 1px solid var(--border);
-        display: flex;
-        gap: 10px;
-        z-index: 101;
-        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
-    }
-
-    .btn-save {
-        flex: 2;
-        background: var(--accent);
-        color: #000;
-        border: none;
-        padding: 12px;
-        border-radius: 6px;
-        font-weight: 800;
-        font-size: 0.9rem;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-
-    .btn-save:hover {
-        background: var(--accent-hover);
-        transform: translateY(-1px);
-    }
-
-    .btn-visit {
-        flex: 1;
-        background: #222;
-        color: #fff;
-        text-align: center;
-        text-decoration: none;
-        padding: 12px;
-        border-radius: 6px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        border: 1px solid #333;
-        transition: all 0.3s;
-    }
-
-    .btn-visit:hover {
-        background: #333;
-    }
-
-    /* Preview container */
-    .customizer-preview {
-        flex-grow: 1;
-        background: #000;
-        position: relative;
-        z-index: 1;
-    }
-
-    .preview-iframe {
-        width: 100%;
-        height: 100%;
-        border: none;
-        background: #fff;
-    }
-
-    .preview-loading {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        color: #fff;
-        font-weight: 600;
-        pointer-events: none;
-        opacity: 0;
-        transition: opacity 0.3s;
-        z-index: 2;
-        background: rgba(0, 0, 0, 0.6);
-        padding: 15px 25px;
-        border-radius: 10px;
-        backdrop-filter: blur(5px);
-    }
-
-    iframe.loading {
-        opacity: 0.4;
-    }
-
-    iframe.loading+.preview-loading {
-        opacity: 1;
-    }
-
-    /* Wagtail Conflict Fixes */
-    #wagtail-sidebar,
-    .sidebar,
-    .wagtail-sidebar {
+    .visual-customizer-page header.nice-padding,
+    .visual-customizer-page .breadcrumb {
         display: none !important;
     }
 
-    #main,
-    main,
-    .content-wrapper,
-    .wrapper {
-        margin-left: 0 !important;
-        padding: 0 !important;
+    /* Main Layout */
+    .vc-layout {
+        display: flex;
+        height: calc(100vh - 50px);
+        font-family: 'Inter', sans-serif;
+        background: var(--vc-bg);
+        overflow: hidden;
+    }
+
+    /* ─── Sidebar ─── */
+    .vc-sidebar {
+        width: 380px;
+        min-width: 380px;
+        background: var(--vc-sidebar);
+        border-right: 1px solid var(--vc-border);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transition: width 0.3s ease;
+    }
+
+    .vc-sidebar.collapsed {
+        width: 0;
+        min-width: 0;
+        border-right: none;
+    }
+
+    .vc-sidebar-header {
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--vc-border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0;
+    }
+
+    .vc-sidebar-header h2 {
+        margin: 0;
+        color: var(--vc-text);
+        font-size: 18px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .vc-sidebar-header h2 i {
+        color: var(--vc-accent);
+    }
+
+    /* Tabs */
+    .vc-tabs {
+        display: flex;
+        border-bottom: 1px solid var(--vc-border);
+        flex-shrink: 0;
+        padding: 0 16px;
+    }
+
+    .vc-tab {
+        flex: 1;
+        padding: 12px 8px;
+        text-align: center;
+        color: var(--vc-text-muted);
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .vc-tab:hover {
+        color: var(--vc-text);
+    }
+
+    .vc-tab.active {
+        color: var(--vc-accent);
+        border-bottom-color: var(--vc-accent);
+    }
+
+    .vc-tab i {
+        font-size: 16px;
+    }
+
+    /* Scrollable Content */
+    .vc-sidebar-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px;
+        scrollbar-width: thin;
+        scrollbar-color: var(--vc-border) transparent;
+    }
+
+    .vc-sidebar-content::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .vc-sidebar-content::-webkit-scrollbar-thumb {
+        background: var(--vc-border);
+        border-radius: 3px;
+    }
+
+    /* Tab Panels */
+    .vc-tab-panel {
+        display: none;
+    }
+
+    .vc-tab-panel.active {
+        display: block;
+    }
+
+    /* Sections */
+    .vc-section {
+        margin-bottom: 16px;
+        background: var(--vc-card);
+        border: 1px solid var(--vc-border);
+        border-radius: var(--vc-radius);
+        overflow: hidden;
+    }
+
+    .vc-section-header {
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .vc-section-header:hover {
+        background: rgba(99, 102, 241, 0.05);
+    }
+
+    .vc-section-header h3 {
+        margin: 0;
+        color: var(--vc-text);
+        font-size: 13px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .vc-section-header h3 i {
+        color: var(--vc-accent);
+        font-size: 14px;
+        width: 20px;
+        text-align: center;
+    }
+
+    .vc-section-chevron {
+        color: var(--vc-text-muted);
+        font-size: 12px;
+        transition: transform 0.3s ease;
+    }
+
+    .vc-section.open .vc-section-chevron {
+        transform: rotate(180deg);
+    }
+
+    .vc-section-body {
+        padding: 0 16px 16px;
+        display: none;
+    }
+
+    .vc-section.open .vc-section-body {
+        display: block;
+    }
+
+    /* Form Fields */
+    .vc-field {
+        margin-bottom: 14px;
+    }
+
+    .vc-field:last-child {
+        margin-bottom: 0;
+    }
+
+    .vc-field label {
+        display: block;
+        color: var(--vc-text-muted);
+        font-size: 11px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+    }
+
+    .vc-input,
+    .vc-select {
+        width: 100%;
+        padding: 10px 12px;
+        background: var(--vc-bg);
+        border: 1px solid var(--vc-border);
+        border-radius: 8px;
+        color: var(--vc-text);
+        font-size: 13px;
+        font-family: 'Inter', sans-serif;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        outline: none;
+        box-sizing: border-box;
+    }
+
+    .vc-input:focus,
+    .vc-select:focus {
+        border-color: var(--vc-accent);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    }
+
+    .vc-select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b8fa3' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 32px;
+        cursor: pointer;
+    }
+
+    /* Color Field */
+    .vc-color-field {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .vc-color {
+        width: 44px;
+        height: 44px;
+        border: 2px solid var(--vc-border);
+        border-radius: 10px;
+        cursor: pointer;
+        padding: 2px;
+        background: var(--vc-bg);
+        flex-shrink: 0;
+        transition: border-color 0.2s;
+    }
+
+    .vc-color:hover {
+        border-color: var(--vc-accent);
+    }
+
+    .vc-color-hex {
+        flex: 1;
+        padding: 10px 12px;
+        background: var(--vc-bg);
+        border: 1px solid var(--vc-border);
+        border-radius: 8px;
+        color: var(--vc-text);
+        font-size: 13px;
+        font-family: 'Inter', monospace;
+        text-transform: uppercase;
+        outline: none;
+    }
+
+    /* Media Upload */
+    .vc-media-preview {
+        width: 100%;
+        height: 120px;
+        background: var(--vc-bg);
+        border: 2px dashed var(--vc-border);
+        border-radius: var(--vc-radius);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: border-color 0.2s, background 0.2s;
+        overflow: hidden;
+        position: relative;
+        margin-bottom: 8px;
+    }
+
+    .vc-media-preview:hover {
+        border-color: var(--vc-accent);
+        background: rgba(99, 102, 241, 0.05);
+    }
+
+    .vc-media-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .vc-media-preview .vc-upload-hint {
+        color: var(--vc-text-muted);
+        font-size: 12px;
+        text-align: center;
+    }
+
+    .vc-media-preview .vc-upload-hint i {
+        font-size: 24px;
+        margin-bottom: 6px;
+        display: block;
+        color: var(--vc-accent);
+    }
+
+    .vc-media-preview .vc-media-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+
+    .vc-media-preview:hover .vc-media-overlay {
+        opacity: 1;
+    }
+
+    .vc-media-overlay span {
+        color: #fff;
+        font-size: 12px;
+        font-weight: 500;
+        background: var(--vc-accent);
+        padding: 6px 14px;
+        border-radius: 6px;
+    }
+
+    .vc-file-input {
+        display: none;
+    }
+
+    /* Buttons */
+    .vc-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        font-family: 'Inter', sans-serif;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: none;
+        outline: none;
+    }
+
+    .vc-btn-primary {
+        background: var(--vc-accent);
+        color: #fff;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .vc-btn-primary:hover {
+        background: var(--vc-accent-hover);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    /* Footer */
+    .vc-sidebar-footer {
+        padding: 16px;
+        border-top: 1px solid var(--vc-border);
+        flex-shrink: 0;
+    }
+
+    /* ─── Preview Panel ─── */
+    .vc-preview {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: var(--vc-bg);
+        position: relative;
+    }
+
+    .vc-preview-toolbar {
+        height: 44px;
+        background: var(--vc-sidebar);
+        border-bottom: 1px solid var(--vc-border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 16px;
+        flex-shrink: 0;
+    }
+
+    .vc-preview-toolbar-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .vc-toolbar-btn {
+        width: 32px;
+        height: 32px;
+        border: 1px solid var(--vc-border);
+        background: var(--vc-card);
+        border-radius: 6px;
+        color: var(--vc-text-muted);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        font-size: 14px;
+    }
+
+    .vc-toolbar-btn:hover {
+        color: var(--vc-text);
+        border-color: var(--vc-accent);
+    }
+
+    .vc-toolbar-btn.active {
+        background: var(--vc-accent);
+        color: #fff;
+        border-color: var(--vc-accent);
+    }
+
+    .vc-preview-url {
+        flex: 1;
+        max-width: 400px;
+        margin: 0 16px;
+        padding: 6px 14px;
+        background: var(--vc-bg);
+        border: 1px solid var(--vc-border);
+        border-radius: 20px;
+        color: var(--vc-text-muted);
+        font-size: 12px;
+        font-family: 'Inter', monospace;
+        text-align: center;
+        outline: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .vc-preview-url i {
+        color: var(--vc-success);
+        font-size: 10px;
+    }
+
+    .vc-device-btns {
+        display: flex;
+        gap: 4px;
+    }
+
+    .vc-iframe-wrapper {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        overflow: hidden;
+    }
+
+    .vc-iframe-container {
+        width: 100%;
+        height: 100%;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        background: #fff;
+        border-radius: 0;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .vc-iframe-container.tablet {
+        width: 768px;
+        height: calc(100% - 40px);
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .vc-iframe-container.mobile {
+        width: 375px;
+        height: calc(100% - 40px);
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .vc-iframe-container iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+
+    /* ─── Toggle Button ─── */
+    .vc-toggle-sidebar {
+        position: absolute;
+        left: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 24px;
+        height: 48px;
+        background: var(--vc-card);
+        border: 1px solid var(--vc-border);
+        border-radius: 0 8px 8px 0;
+        color: var(--vc-text-muted);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        transition: all 0.2s;
+        display: none;
+    }
+
+    .vc-sidebar.collapsed~.vc-preview .vc-toggle-sidebar {
+        display: flex;
+    }
+
+    .vc-toggle-sidebar:hover {
+        color: var(--vc-accent);
+        border-color: var(--vc-accent);
+    }
+
+    /* ─── Image Browser ─── */
+    .vc-image-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .vc-image-thumb {
+        aspect-ratio: 1;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 2px solid var(--vc-border);
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .vc-image-thumb:hover {
+        border-color: var(--vc-accent);
+        transform: scale(1.02);
+    }
+
+    .vc-image-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* ─── Status Badge ─── */
+    .vc-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        background: rgba(34, 197, 94, 0.1);
+        border: 1px solid rgba(34, 197, 94, 0.2);
+        border-radius: 20px;
+        font-size: 11px;
+        color: var(--vc-success);
+        font-weight: 500;
+    }
+
+    .vc-status-dot {
+        width: 6px;
+        height: 6px;
+        background: var(--vc-success);
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.4;
+        }
+    }
+
+    /* ─── Messages ─── */
+    .vc-toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        padding: 14px 20px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        animation: slideIn 0.3s ease;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .vc-toast.success {
+        background: var(--vc-success);
+    }
+
+    .vc-toast.error {
+        background: var(--vc-danger);
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
     }
 </style>
 {% endblock %}
 
-{% block titletag %}Visual Customizer{% endblock %}
-
 {% block content %}
-<div class="customizer-wrapper">
-    <aside class="customizer-sidebar">
-        <header class="customizer-header">
-            <div class="header-left">
-                <h1>Visual Customizer</h1>
-                <p>Live Theme Engine</p>
+{% if messages %}
+{% for message in messages %}
+<div class="vc-toast {{ message.tags }}">
+    <i class="fas fa-check-circle"></i> {{ message }}
+</div>
+{% endfor %}
+{% endif %}
+
+<form method="POST" enctype="multipart/form-data" id="customizerForm">
+    {% csrf_token %}
+    <div class="vc-layout">
+        <!-- ─── SIDEBAR ─── -->
+        <div class="vc-sidebar" id="vcSidebar">
+            <div class="vc-sidebar-header">
+                <h2><i class="fas fa-palette"></i> Visual Customizer</h2>
+                <span class="vc-status"><span class="vc-status-dot"></span> Live</span>
             </div>
-            <a href="{% url 'wagtailadmin_home' %}" class="btn-back">Dashboard</a>
-        </header>
 
-        <div class="customizer-sidebar-scrollable">
-            <div class="customizer-form-body">
-                <form id="customizer-form" action="{% url 'theme_customizer' %}" method="POST">
-                    {% csrf_token %}
+            <!-- Tabs -->
+            <div class="vc-tabs">
+                <div class="vc-tab active" data-tab="design">
+                    <i class="fas fa-paintbrush"></i> Design
+                </div>
+                <div class="vc-tab" data-tab="media">
+                    <i class="fas fa-image"></i> Media
+                </div>
+                <div class="vc-tab" data-tab="typography">
+                    <i class="fas fa-font"></i> Fonts
+                </div>
+            </div>
 
-                    <div class="form-section">
-                        <h3>Design & Identity</h3>
-                        {{ form.as_p }}
+            <!-- Tab Content -->
+            <div class="vc-sidebar-content">
+                <!-- ═══ DESIGN TAB ═══ -->
+                <div class="vc-tab-panel active" id="tab-design">
+                    <!-- Theme -->
+                    <div class="vc-section open">
+                        <div class="vc-section-header" onclick="toggleSection(this)">
+                            <h3><i class="fas fa-swatchbook"></i> Theme Layout</h3>
+                            <i class="fas fa-chevron-down vc-section-chevron"></i>
+                        </div>
+                        <div class="vc-section-body">
+                            <div class="vc-field">
+                                <label>Base Theme</label>
+                                {{ form.base_theme }}
+                            </div>
+                            <div class="vc-field">
+                                <label>Animation Preset</label>
+                                {{ form.animation_preset }}
+                            </div>
+                        </div>
                     </div>
-                </form>
+
+                    <!-- Brand -->
+                    <div class="vc-section open">
+                        <div class="vc-section-header" onclick="toggleSection(this)">
+                            <h3><i class="fas fa-building"></i> Brand Identity</h3>
+                            <i class="fas fa-chevron-down vc-section-chevron"></i>
+                        </div>
+                        <div class="vc-section-body">
+                            <div class="vc-field">
+                                <label>Site Name</label>
+                                {{ form.site_name }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Colors -->
+                    <div class="vc-section open">
+                        <div class="vc-section-header" onclick="toggleSection(this)">
+                            <h3><i class="fas fa-droplet"></i> Color Palette</h3>
+                            <i class="fas fa-chevron-down vc-section-chevron"></i>
+                        </div>
+                        <div class="vc-section-body">
+                            <div class="vc-field">
+                                <label>Primary Color</label>
+                                <div class="vc-color-field">
+                                    {{ form.primary_color }}
+                                    <input type="text" class="vc-color-hex" value="{{ config.primary_color }}"
+                                        data-sync="id_primary_color">
+                                </div>
+                            </div>
+                            <div class="vc-field">
+                                <label>Secondary Color</label>
+                                <div class="vc-color-field">
+                                    {{ form.secondary_color }}
+                                    <input type="text" class="vc-color-hex" value="{{ config.secondary_color }}"
+                                        data-sync="id_secondary_color">
+                                </div>
+                            </div>
+                            <div class="vc-field">
+                                <label>Background Color</label>
+                                <div class="vc-color-field">
+                                    {{ form.background_color }}
+                                    <input type="text" class="vc-color-hex" value="{{ config.background_color }}"
+                                        data-sync="id_background_color">
+                                </div>
+                            </div>
+                            <div class="vc-field">
+                                <label>Text Color</label>
+                                <div class="vc-color-field">
+                                    {{ form.text_color }}
+                                    <input type="text" class="vc-color-hex" value="{{ config.text_color }}"
+                                        data-sync="id_text_color">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══ MEDIA TAB ═══ -->
+                <div class="vc-tab-panel" id="tab-media">
+                    <!-- Logo -->
+                    <div class="vc-section open">
+                        <div class="vc-section-header" onclick="toggleSection(this)">
+                            <h3><i class="fas fa-star"></i> Site Logo</h3>
+                            <i class="fas fa-chevron-down vc-section-chevron"></i>
+                        </div>
+                        <div class="vc-section-body">
+                            <div class="vc-media-preview" onclick="document.getElementById('id_logo_upload').click()">
+                                {% if current_logo %}
+                                {% image current_logo max-300x120 as logo_img %}
+                                <img src="{{ logo_img.url }}" alt="Current Logo">
+                                <div class="vc-media-overlay"><span><i class="fas fa-upload"></i> Replace</span></div>
+                                {% else %}
+                                <div class="vc-upload-hint">
+                                    <i class="fas fa-cloud-arrow-up"></i>
+                                    Click to upload logo
+                                </div>
+                                {% endif %}
+                            </div>
+                            {{ form.logo_upload }}
+                        </div>
+                    </div>
+
+                    <!-- Hero Background -->
+                    <div class="vc-section open">
+                        <div class="vc-section-header" onclick="toggleSection(this)">
+                            <h3><i class="fas fa-panorama"></i> Hero Background</h3>
+                            <i class="fas fa-chevron-down vc-section-chevron"></i>
+                        </div>
+                        <div class="vc-section-body">
+                            <div class="vc-media-preview"
+                                onclick="document.getElementById('id_hero_image_upload').click()"
+                                style="height: 160px;">
+                                {% if current_hero_bg %}
+                                {% image current_hero_bg fill-340x160 as hero_img %}
+                                <img src="{{ hero_img.url }}" alt="Hero Background">
+                                <div class="vc-media-overlay"><span><i class="fas fa-upload"></i> Replace</span></div>
+                                {% else %}
+                                <div class="vc-upload-hint">
+                                    <i class="fas fa-image"></i>
+                                    Click to upload hero background
+                                </div>
+                                {% endif %}
+                            </div>
+                            {{ form.hero_image_upload }}
+
+                            <div class="vc-field" style="margin-top: 12px;">
+                                <label>Or use a Video URL</label>
+                                {{ form.hero_video_url }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Image Library -->
+                    <div class="vc-section">
+                        <div class="vc-section-header" onclick="toggleSection(this)">
+                            <h3><i class="fas fa-images"></i> Image Library</h3>
+                            <i class="fas fa-chevron-down vc-section-chevron"></i>
+                        </div>
+                        <div class="vc-section-body">
+                            <div class="vc-image-grid">
+                                {% for img in images %}
+                                <div class="vc-image-thumb" title="{{ img.title }}">
+                                    {% image img fill-100x100 as thumb %}
+                                    <img src="{{ thumb.url }}" alt="{{ img.title }}">
+                                </div>
+                                {% empty %}
+                                <p
+                                    style="color: var(--vc-text-muted); font-size: 12px; grid-column: 1/-1; text-align: center; padding: 20px;">
+                                    No images uploaded yet.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══ TYPOGRAPHY TAB ═══ -->
+                <div class="vc-tab-panel" id="tab-typography">
+                    <div class="vc-section open">
+                        <div class="vc-section-header" onclick="toggleSection(this)">
+                            <h3><i class="fas fa-heading"></i> Heading Font</h3>
+                            <i class="fas fa-chevron-down vc-section-chevron"></i>
+                        </div>
+                        <div class="vc-section-body">
+                            <div class="vc-field">
+                                <label>Font Family</label>
+                                {{ form.heading_font }}
+                            </div>
+                            <div class="vc-field" style="margin-top: 12px;">
+                                <label>Preview</label>
+                                <div
+                                    style="padding: 16px; background: var(--vc-bg); border-radius: 8px; text-align: center;">
+                                    <span id="headingPreview"
+                                        style="color: var(--vc-text); font-size: 24px; font-weight: 700;">Aa Bb
+                                        Cc</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vc-section open">
+                        <div class="vc-section-header" onclick="toggleSection(this)">
+                            <h3><i class="fas fa-align-left"></i> Body Font</h3>
+                            <i class="fas fa-chevron-down vc-section-chevron"></i>
+                        </div>
+                        <div class="vc-section-body">
+                            <div class="vc-field">
+                                <label>Font Family</label>
+                                {{ form.body_font }}
+                            </div>
+                            <div class="vc-field" style="margin-top: 12px;">
+                                <label>Preview</label>
+                                <div style="padding: 16px; background: var(--vc-bg); border-radius: 8px;">
+                                    <p id="bodyPreview"
+                                        style="color: var(--vc-text); font-size: 14px; line-height: 1.6; margin: 0;">
+                                        The quick brown fox jumps over the lazy dog.
+                                        Pack my box with five dozen liquor jugs.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="vc-sidebar-footer">
+                <button type="submit" class="vc-btn vc-btn-primary">
+                    <i class="fas fa-check"></i> Save & Apply Changes
+                </button>
             </div>
         </div>
 
-        <footer class="customizer-footer">
-            <button type="submit" form="customizer-form" class="btn-save">Save changes</button>
-            <a href="/" target="_blank" class="btn-visit">View Site</a>
-        </footer>
-    </aside>
+        <!-- ─── PREVIEW ─── -->
+        <div class="vc-preview">
+            <div class="vc-preview-toolbar">
+                <div class="vc-preview-toolbar-left">
+                    <button type="button" class="vc-toolbar-btn" id="toggleSidebarBtn" title="Toggle Sidebar"
+                        onclick="toggleSidebar()">
+                        <i class="fas fa-columns"></i>
+                    </button>
+                    <button type="button" class="vc-toolbar-btn" title="Refresh Preview" onclick="refreshPreview()">
+                        <i class="fas fa-arrows-rotate"></i>
+                    </button>
+                </div>
 
-    <main class="customizer-preview">
-        <iframe id="preview" src="/" class="preview-iframe"></iframe>
-        <div class="preview-loading">Reloading preview...</div>
-    </main>
-</div>
+                <div class="vc-preview-url">
+                    <i class="fas fa-circle"></i>
+                    {{ request.get_host }}
+                </div>
+
+                <div class="vc-device-btns">
+                    <button type="button" class="vc-toolbar-btn active" data-device="desktop" title="Desktop">
+                        <i class="fas fa-desktop"></i>
+                    </button>
+                    <button type="button" class="vc-toolbar-btn" data-device="tablet" title="Tablet">
+                        <i class="fas fa-tablet-screen-button"></i>
+                    </button>
+                    <button type="button" class="vc-toolbar-btn" data-device="mobile" title="Mobile">
+                        <i class="fas fa-mobile-screen-button"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="vc-iframe-wrapper">
+                <div class="vc-iframe-container" id="iframeContainer">
+                    <iframe src="{{ preview_url }}" id="previewFrame" title="Preview"></iframe>
+                </div>
+            </div>
+
+            <button type="button" class="vc-toggle-sidebar" onclick="toggleSidebar()">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+</form>
 {% endblock %}
 
 {% block extra_js %}
 {{ block.super }}
 <script>
-    const form = document.getElementById('customizer-form');
-    const iframe = document.getElementById('preview');
+    (function () {
+        // ── Tab Switching ──
+        document.querySelectorAll('.vc-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.vc-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.vc-tab-panel').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+            });
+        });
 
-    form.addEventListener('submit', function () {
-        iframe.classList.add('loading');
-    });
+        // ── Section Toggle ──
+        window.toggleSection = function (header) {
+            header.parentElement.classList.toggle('open');
+        };
 
-    iframe.addEventListener('load', function () {
-        iframe.classList.remove('loading');
-    });
+        // ── Sidebar Toggle ──
+        window.toggleSidebar = function () {
+            document.getElementById('vcSidebar').classList.toggle('collapsed');
+        };
+
+        // ── Device Preview ──
+        document.querySelectorAll('[data-device]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('[data-device]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const container = document.getElementById('iframeContainer');
+                container.className = 'vc-iframe-container ' + (btn.dataset.device === 'desktop' ? '' : btn.dataset.device);
+            });
+        });
+
+        // ── Refresh Preview ──
+        window.refreshPreview = function () {
+            const iframe = document.getElementById('previewFrame');
+            iframe.src = iframe.src;
+        };
+
+        // ── Color Sync ──
+        document.querySelectorAll('.vc-color').forEach(picker => {
+            picker.addEventListener('input', () => {
+                const hex = picker.parentElement.querySelector('.vc-color-hex');
+                if (hex) hex.value = picker.value;
+            });
+        });
+        document.querySelectorAll('.vc-color-hex').forEach(hex => {
+            hex.addEventListener('input', () => {
+                const syncId = hex.dataset.sync;
+                if (syncId) {
+                    const picker = document.getElementById(syncId);
+                    if (picker && /^#[0-9A-Fa-f]{6}$/.test(hex.value)) {
+                        picker.value = hex.value;
+                    }
+                }
+            });
+        });
+
+        // ── Font Preview ──
+        const headingFontSelect = document.getElementById('id_heading_font');
+        const bodyFontSelect = document.getElementById('id_body_font');
+
+        function loadGoogleFont(fontName) {
+            const link = document.createElement('link');
+            link.href = 'https://fonts.googleapis.com/css2?family=' + fontName.replace(/ /g, '+') + ':wght@400;700&display=swap';
+            link.rel = 'stylesheet';
+            document.head.appendChild(link);
+        }
+
+        if (headingFontSelect) {
+            headingFontSelect.addEventListener('change', function () {
+                loadGoogleFont(this.value);
+                document.getElementById('headingPreview').style.fontFamily = "'" + this.value + "', sans-serif";
+            });
+            // Init
+            loadGoogleFont(headingFontSelect.value);
+            document.getElementById('headingPreview').style.fontFamily = "'" + headingFontSelect.value + "', sans-serif";
+        }
+        if (bodyFontSelect) {
+            bodyFontSelect.addEventListener('change', function () {
+                loadGoogleFont(this.value);
+                document.getElementById('bodyPreview').style.fontFamily = "'" + this.value + "', sans-serif";
+            });
+            loadGoogleFont(bodyFontSelect.value);
+            document.getElementById('bodyPreview').style.fontFamily = "'" + bodyFontSelect.value + "', sans-serif";
+        }
+
+        // ── File Upload Preview ──
+        function setupFilePreview(inputId, previewSelector) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            input.addEventListener('change', function () {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    const preview = this.closest('.vc-section-body').querySelector('.vc-media-preview');
+                    reader.onload = function (e) {
+                        preview.innerHTML = '<img src="' + e.target.result + '" alt="Preview"><div class="vc-media-overlay"><span><i class="fas fa-check"></i> Selected</span></div>';
+                    };
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        }
+        setupFilePreview('id_logo_upload');
+        setupFilePreview('id_hero_image_upload');
+
+        // ── Toast Auto-dismiss ──
+        setTimeout(() => {
+            document.querySelectorAll('.vc-toast').forEach(t => {
+                t.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(() => t.remove(), 300);
+            });
+        }, 3000);
+    })();
 </script>
 {% endblock %}

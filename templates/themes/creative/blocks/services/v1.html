@@ -1,0 +1,31 @@
+<div class="container py-5">
+    <div class="mb-5">
+        <h2 class="display-2 mb-0">{{ self.title }}</h2>
+        <div class="bg-secondary" style="height: 10px; width: 200px; margin-top: -15px; opacity: 0.5;"></div>
+    </div>
+    <div class="row g-0">
+        {% for item in self.services %}
+        <div class="col-lg-4 border border-dark p-5 hover-bg-primary transition-all">
+            {% if item.icon %}
+            <i class="fas {{ item.icon }} fs-1 mb-4"></i>
+            {% endif %}
+            <h3 class="h2 mb-3">{{ item.name }}</h3>
+            <p class="fs-5">{{ item.description }}</p>
+            {% if item.cta_text %}
+            <a href="{{ item.link }}" class="btn-creative mt-3 d-inline-block">{{ item.cta_text }}</a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .hover-bg-primary:hover {
+        background: var(--primary);
+        color: white;
+    }
+
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+</style>

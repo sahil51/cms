@@ -1,0 +1,12 @@
+{% extends "themes/editorial/base.html" %}
+{% load wagtailcore_tags %}
+
+{% block content %}
+<article class="editorial-article">
+    {% for block in page.body %}
+    <div class="mb-5">
+        {{ block }}
+    </div>
+    {% endfor %}
+</article>
+{% endblock %}

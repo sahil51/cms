@@ -59,3 +59,21 @@ def get_site_settings(context):
         return SiteSettings.for_site(site)
     except Exception:
         return None
+
+@register.filter
+def split_string_before(value, index):
+    """Returns the part of the string before the given index."""
+    try:
+        idx = int(index)
+        return value[:idx]
+    except (ValueError, TypeError):
+        return value
+
+@register.filter
+def split_string_after(value, index):
+    """Returns the part of the string after the given index."""
+    try:
+        idx = int(index)
+        return value[idx:]
+    except (ValueError, TypeError):
+        return ""

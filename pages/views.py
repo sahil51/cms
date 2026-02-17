@@ -33,9 +33,9 @@ def search(request):
     )
 
 def theme_customizer(request):
-    """View for side-by-side theme editing."""
-    from wagtail.admin.forms.models import WagtailAdminModelForm
+    """View for full-page visual theme editing."""
     from django import forms
+    from wagtail.images.models import Image
     
     current_site = Site.find_for_request(request)
     if not current_site:
@@ -43,32 +43,80 @@ def theme_customizer(request):
     
     config = ThemeSettings.for_site(current_site)
     
-    # Create a dynamic form for ThemeSettings
+    FONT_CHOICES = [
+        ('Inter', 'Inter'), ('Roboto', 'Roboto'), ('Poppins', 'Poppins'),
+        ('Montserrat', 'Montserrat'), ('Open Sans', 'Open Sans'),
+        ('Lato', 'Lato'), ('Raleway', 'Raleway'), ('Outfit', 'Outfit'),
+        ('Playfair Display', 'Playfair Display'), ('DM Sans', 'DM Sans'),
+        ('Space Grotesk', 'Space Grotesk'), ('Oswald', 'Oswald'),
+    ]
+    
+    ANIMATION_CHOICES = [
+        ('smooth-fade', 'Smooth Fade'), ('slide-up', 'Slide Up'),
+        ('zoom-in', 'Zoom In'), ('none', 'No Animation'),
+    ]
+    
     class ThemeSettingsForm(forms.ModelForm):
+        logo_upload = forms.ImageField(required=False, label="Upload New Logo")
+        hero_image_upload = forms.ImageField(required=False, label="Upload Hero Background")
+        
         class Meta:
             model = ThemeSettings
             fields = [
-                'base_theme', 'primary_color', 'secondary_color', 
-                'background_color', 'text_color', 'heading_font', 'body_font'
+                'base_theme', 'site_name',
+                'primary_color', 'secondary_color', 'background_color', 'text_color',
+                'heading_font', 'body_font',
+                'hero_video_url', 'animation_preset',
             ]
             widgets = {
-                'primary_color': forms.TextInput(attrs={'type': 'color'}),
-                'secondary_color': forms.TextInput(attrs={'type': 'color'}),
-                'background_color': forms.TextInput(attrs={'type': 'color'}),
-                'text_color': forms.TextInput(attrs={'type': 'color'}),
+                'base_theme': forms.Select(attrs={'class': 'vc-select'}),
+                'site_name': forms.TextInput(attrs={'class': 'vc-input', 'placeholder': 'Your Site Name'}),
+                'primary_color': forms.TextInput(attrs={'type': 'color', 'class': 'vc-color'}),
+                'secondary_color': forms.TextInput(attrs={'type': 'color', 'class': 'vc-color'}),
+                'background_color': forms.TextInput(attrs={'type': 'color', 'class': 'vc-color'}),
+                'text_color': forms.TextInput(attrs={'type': 'color', 'class': 'vc-color'}),
+                'heading_font': forms.Select(choices=FONT_CHOICES, attrs={'class': 'vc-select'}),
+                'body_font': forms.Select(choices=FONT_CHOICES, attrs={'class': 'vc-select'}),
+                'hero_video_url': forms.URLInput(attrs={'class': 'vc-input', 'placeholder': 'https://...video.mp4'}),
+                'animation_preset': forms.Select(choices=ANIMATION_CHOICES, attrs={'class': 'vc-select'}),
             }
 
     if request.method == 'POST':
-        form = ThemeSettingsForm(request.POST, instance=config)
+        form = ThemeSettingsForm(request.POST, request.FILES, instance=config)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Theme settings updated successfully!")
+            obj = form.save(commit=False)
+            
+            # Handle logo upload
+            logo_file = form.cleaned_data.get('logo_upload')
+            if logo_file:
+                logo_image = Image(title=f"Logo - {logo_file.name}", file=logo_file)
+                logo_image.save()
+                obj.logo = logo_image
+            
+            # Handle hero background upload
+            hero_file = form.cleaned_data.get('hero_image_upload')
+            if hero_file:
+                hero_image = Image(title=f"Hero BG - {hero_file.name}", file=hero_file)
+                hero_image.save()
+                obj.hero_bg_image = hero_image
+            
+            obj.save()
+            messages.success(request, f"Theme updated to '{obj.base_theme}' successfully!")
             return redirect('theme_customizer')
+        else:
+            messages.error(request, f"Error saving theme: {form.errors}")
+
     else:
         form = ThemeSettingsForm(instance=config)
 
+    # Get all images for the image browser
+    images = Image.objects.order_by('-created_at')[:30]
+    
     return render(request, 'pages/admin/customizer.html', {
         'form': form,
-        'preview_url': '/',  # Use relative path to avoid host mismatch issues
+        'preview_url': '/',
         'config': config,
+        'images': images,
+        'current_logo': config.logo,
+        'current_hero_bg': config.hero_bg_image,
     })

@@ -1,0 +1,26 @@
+{% load wagtailimages_tags %}
+
+<div class="editorial-hero py-5">
+    <div class="row align-items-center mb-5">
+        <div class="col-lg-12 text-center">
+            <h1 class="display-1 mb-4" style="font-size: 6rem; line-height: 1;">{{ self.title }}</h1>
+            <p class="fs-4 italic mx-auto" style="max-width: 800px; font-family: var(--serif);">
+                {{ self.subtitle }}
+            </p>
+        </div>
+    </div>
+    {% if self.image %}
+    <div class="row mb-5">
+        <div class="col-12">
+            {% image self.image original class="img-fluid w-100" style="height: 60vh; object-fit: cover; filter:
+            sepia(0.2);" %}
+            <div class="text-end mt-2">
+                <small class="text-muted border-top pt-1">ESSAY IN IMAGERY / PHOTO BY GAZETTE</small>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <div class="text-center">
+        <a href="{{ self.cta_link }}" class="btn-editorial">{{ self.cta_text }}</a>
+    </div>
+</div>

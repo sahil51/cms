@@ -1,0 +1,16 @@
+<div class="container py-5">
+    <div class="row g-5">
+        <div class="col-lg-5">
+            {% if self.image %}
+            {% load wagtailimages_tags %}
+            {% image self.image original class="img-fluid w-100 border border-dark" style="filter: grayscale(1);" %}
+            {% endif %}
+        </div>
+        <div class="col-lg-7">
+            <h2 class="display-3 mb-5 border-bottom pb-3">{{ self.title }}</h2>
+            <div class="editorial-content fs-4 font-serif italic">
+                {{ self.content|richtext }}
+            </div>
+        </div>
+    </div>
+</div>

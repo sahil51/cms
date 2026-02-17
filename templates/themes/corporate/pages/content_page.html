@@ -1,0 +1,14 @@
+{% extends "themes/corporate/base.html" %}
+{% load wagtailcore_tags %}
+
+{% block content %}
+<div class="streamfield-content">
+    {% for block in page.body %}
+    <section id="{{ block.value.section_id }}"
+        class="block-{{ block.block_type }} {% if not block.value.visible %}d-none{% endif %}"
+        data-aos="{{ block.value.animation|default:'fade-up' }}">
+        {{ block }}
+    </section>
+    {% endfor %}
+</div>
+{% endblock %}

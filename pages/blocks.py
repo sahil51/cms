@@ -18,6 +18,9 @@ class BaseBlock(blocks.StructBlock):
         ('zoom-in', 'Zoom In'),
     ], default='fade-up', help_text="Select the AOS animation effect.")
 
+    section_tag = blocks.CharBlock(
+        required=False, help_text="Optional tag shown above the main heading (e.g. 'Our Services')")
+
     section_id = blocks.CharBlock(
         required=False, help_text="Optional HTML id for anchor links (e.g. 'services')")
     
@@ -141,7 +144,7 @@ class ServicesBlock(BaseBlock):
         ('image', ImageChooserBlock(required=False, help_text="Service featured image")),
         ('name', blocks.CharBlock(required=True)),
         ('description', blocks.TextBlock(required=True)),
-        ('cta_text', blocks.CharBlock(required=False, default="Learn More")),
+        ('cta_text', blocks.CharBlock(required=False)),
         ('link', blocks.URLBlock(required=False)),
     ]))
 
@@ -196,7 +199,7 @@ class ProcessStepsBlock(BaseBlock):
         label = "Process Steps"
 
 class TrustBarBlock(BaseBlock):
-    title = blocks.CharBlock(required=False, default="Trusted By")
+    title = blocks.CharBlock(required=False)
     logos = blocks.ListBlock(blocks.StructBlock([
         ('name', blocks.CharBlock(required=True)),
         ('logo', ImageChooserBlock(required=True)),
@@ -291,8 +294,7 @@ class LeadFormBlock(BaseBlock):
     title = blocks.CharBlock(required=True)
     subtitle = blocks.TextBlock(required=False)
     form_action = blocks.URLBlock(required=False, help_text="Form submit URL")
-    success_message = blocks.CharBlock(
-        required=False, default="Thank you! We'll be in touch shortly.")
+    success_message = blocks.CharBlock(required=False)
     fields = blocks.ListBlock(blocks.StructBlock([
         ('label', blocks.CharBlock(required=True)),
         ('field_type', blocks.ChoiceBlock(choices=[

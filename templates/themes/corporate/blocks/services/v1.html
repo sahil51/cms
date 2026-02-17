@@ -1,0 +1,49 @@
+<div class="py-5 bg-light">
+    <div class="container py-5">
+        <div class="text-center max-w-2xl mx-auto mb-5">
+            <h2 class="display-5 mb-3">{{ self.title }}</h2>
+            <p class="text-muted lead">{{ self.subtitle }}</p>
+        </div>
+        <div class="row g-4 mt-4">
+            {% for item in self.services %}
+            <div class="col-lg-4 col-md-6">
+                <div class="card border-0 shadow-sm h-100 p-4 transition-transform hover-translate-y">
+                    <div class="mb-4">
+                        {% if item.icon %}
+                        <div class="bg-primary bg-opacity-10 rounded-pill d-inline-flex align-items-center justify-content-center"
+                            style="width: 60px; height: 60px;">
+                            <i class="fas {{ item.icon }} text-primary fs-4"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <h4 class="mb-3">{{ item.name }}</h4>
+                    <p class="text-muted mb-4">{{ item.description }}</p>
+                    {% if item.cta_text %}
+                    <a href="{{ item.link }}" class="text-decoration-none fw-bold text-primary">
+                        {{ item.cta_text }} <i class="fas fa-arrow-right ms-2 scale-hover"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-translate-y {
+        transition: transform 0.3s ease;
+    }
+
+    .hover-translate-y:hover {
+        transform: translateY(-10px);
+    }
+
+    .scale-hover {
+        transition: transform 0.3s ease;
+    }
+
+    .text-decoration-none:hover .scale-hover {
+        transform: translateX(5px);
+    }
+</style>

@@ -1,0 +1,84 @@
+{% extends "wagtailadmin/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .customizer-container {
+        display: flex;
+        height: calc(100vh - 80px);
+        margin: -20px;
+    }
+
+    .settings-sidebar {
+        width: 350px;
+        background: #fff;
+        border-right: 1px solid #ddd;
+        padding: 20px;
+        overflow-y: auto;
+    }
+
+    .preview-iframe {
+        flex-grow: 1;
+        border: none;
+        background: #f0f0f0;
+    }
+
+    .sidebar-header {
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .field-wrapper {
+        margin-bottom: 15px;
+    }
+
+    .field-wrapper label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .field-wrapper input[type="color"] {
+        width: 100%;
+        height: 40px;
+        padding: 0;
+        border: 1px solid #ddd;
+    }
+
+    .field-wrapper select,
+    .field-wrapper input[type="text"] {
+        width: 100%;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="customizer-container">
+    <div class="settings-sidebar">
+        <div class="sidebar-header">
+            <h2>Theme Customizer</h2>
+            <p>Modify your theme settings and preview changes live.</p>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="field-wrapper">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                <small class="help-text">{{ field.help_text }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="button bicolor icon icon-plus">Save Settings</button>
+        </form>
+    </div>
+
+    <iframe src="{{ preview_url }}" class="preview-iframe" id="preview-frame"></iframe>
+</div>
+{% endblock %}

@@ -1,0 +1,171 @@
+{% load static wagtailcore_tags wagtailimages_tags wagtailuserbar %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>{{ page.title }} | Creative</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Syne:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: {
+                    {
+                    config.primary_color|default: '#9333ea'
+                }
+            }
+
+            ;
+
+            --secondary: {
+                    {
+                    config.secondary_color|default: '#db2777'
+                }
+            }
+
+            ;
+            --accent: #facc15;
+
+            --bg: {
+                    {
+                    config.background_color|default: '#ffffff'
+                }
+            }
+
+            ;
+
+            --text: {
+                    {
+                    config.text_color|default: '#171717'
+                }
+            }
+
+            ;
+        }
+
+
+        body {
+            font-family: 'Syne', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+        }
+
+        .creative-header {
+            padding: 2rem 0;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--text);
+        }
+
+        .navbar-brand {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 2rem;
+            color: var(--text);
+            transform: rotate(-3deg);
+            background: var(--primary);
+            color: white;
+            padding: 0 1rem;
+            display: inline-block;
+        }
+
+        .nav-link {
+            font-weight: 700;
+            color: var(--text);
+            text-transform: uppercase;
+            font-size: 1.2rem;
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 4px;
+            background: var(--secondary);
+            transition: width 0.3s;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .btn-creative {
+            background: var(--text);
+            color: white;
+            padding: 1rem 2rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            border: none;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+            transition: all 0.3s;
+        }
+
+        .btn-creative:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.05) rotate(2deg);
+        }
+
+        footer {
+            background: var(--text);
+            color: white;
+            padding: 5rem 0;
+            clip-path: polygon(0 15%, 100% 0, 100% 100%, 0 100%);
+        }
+    </style>
+</head>
+
+<body>
+    {% wagtailuserbar %}
+
+    <header class="creative-header sticky-top">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a class="navbar-brand" href="/">CREA<span>TIVE</span></a>
+            <nav class="d-none d-lg-flex gap-4">
+                {% for item in menu_items %}
+                <a class="nav-link" href="{{ item.link }}">{{ item.title }}</a>
+                {% endfor %}
+            </nav>
+            <a href="/contact/" class="btn-creative">Let's Talk</a>
+        </div>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <h2 class="display-1 mb-4">Wanna build <span style="color:var(--primary)">Magic</span>?</h2>
+                    <p class="lead opacity-75">Pushing boundaries of digital arts and irregular experiences.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

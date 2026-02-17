@@ -1,0 +1,148 @@
+{% load static wagtailcore_tags wagtailimages_tags wagtailuserbar %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>{{ page.title }} | Editorial</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Inter:wght@400;600&display=swap"
+        rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: {
+                    {
+                    config.primary_color|default: '#000000'
+                }
+            }
+
+            ;
+
+            --bg: {
+                    {
+                    config.background_color|default: '#fcfcfc'
+                }
+            }
+
+            ;
+
+            --text: {
+                    {
+                    config.text_color|default: '#1a1a1a'
+                }
+            }
+
+            ;
+            --serif: 'Playfair Display',
+            serif;
+            --sans: 'Inter',
+            sans-serif;
+        }
+
+
+        body {
+            font-family: var(--sans);
+            background-color: var(--bg);
+            color: var(--text);
+            padding-top: 2rem;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: var(--serif);
+            font-weight: 900;
+        }
+
+        .editorial-header {
+            border-bottom: 4px solid var(--primary);
+            padding-bottom: 2rem;
+            margin-bottom: 4rem;
+            text-align: center;
+        }
+
+        .site-title {
+            font-family: var(--serif);
+            font-size: 5rem;
+            letter-spacing: -3px;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .nav-editorial {
+            border-top: 1px solid #ddd;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+
+        .nav-editorial a {
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .btn-editorial {
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 0.5rem 2rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .btn-editorial:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        footer {
+            border-top: 1px solid #ddd;
+            padding: 4rem 0;
+            margin-top: 5rem;
+            text-align: center;
+            font-family: var(--serif);
+        }
+    </style>
+</head>
+
+<body>
+    {% wagtailuserbar %}
+
+    <div class="container">
+        <header class="editorial-header">
+            <a href="/" class="site-title">{{ settings.site_name|default:"GAZETTE" }}</a>
+            <nav class="nav-editorial">
+                {% for item in menu_items %}
+                <a href="{{ item.link }}">{{ item.title }}</a>
+                {% endfor %}
+            </nav>
+        </header>
+
+        {% block content %}{% endblock %}
+
+        <footer>
+            <h2 class="mb-4">Final Thought</h2>
+            <p class="font-italic">"The art of storytelling is the intersection of Truth and Typography."</p>
+            <hr class="w-25 mx-auto my-4">
+            <p>© {% now "Y" %} {{ settings.site_name }}. Established MMXVIII.</p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

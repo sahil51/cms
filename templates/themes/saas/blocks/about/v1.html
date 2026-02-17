@@ -1,0 +1,22 @@
+<div class="container py-5">
+    <div class="card-saas">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <h2 class="display-4 fw-bold mb-4">{{ self.title }}</h2>
+                <div class="text-white-50 fs-5 mb-4">
+                    {{ self.content|richtext }}
+                </div>
+            </div>
+            <div class="col-lg-6">
+                {% if self.image %}
+                {% load wagtailimages_tags %}
+                <div class="position-relative">
+                    <div class="position-absolute inset-0 bg-primary opacity-20 blur-3xl rounded-full"
+                        style="z-index: -1;"></div>
+                    {% image self.image original class="img-fluid rounded-4 shadow-lg border border-white-10" %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
